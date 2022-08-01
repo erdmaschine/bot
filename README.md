@@ -19,6 +19,5 @@ There is no public invite link.
   ```
   https://discord.com/api/oauth2/authorize?client_id=<appid>&permissions=2147486784&scope=bot%20applications.commands
   ```
-- Start supporting services via docker-compose
 - Copy the `.env.template` file as new `.env` file and adjust accordingly
 - Run/Debug the project

@@ -1,1 +1,1 @@
-worker: java -jar target/bot-1.0.0.jar
+worker: java $JAVA_OPTS -cp target/classes:target/dependency/* erdmaschine.bot.MainKt
