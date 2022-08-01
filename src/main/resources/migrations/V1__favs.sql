@@ -9,7 +9,3 @@ create table if not exists favs
     "authorId"  varchar(100) not null,
     tags        varchar(200) not null
 );
-
-alter table favs
-    owner to postgres;
-
