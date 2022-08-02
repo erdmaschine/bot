@@ -14,7 +14,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 fun main() = runBlocking {
     val env = Env()
-    val log = LoggerFactory.getLogger("apoy2k.greenbot.Main")!!
+    val log = LoggerFactory.getLogger("erdmaschine.bot.Main")!!
 
     try {
         log.info("Starting up erdmaschine-bot")

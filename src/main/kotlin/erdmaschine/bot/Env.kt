@@ -20,5 +20,11 @@ class Env {
     val deployCommandsGobal: String
         get() = get("DEPLOY_COMMANDS_GLOBAL")
 
+    val redditClientId: String
+        get() = get("REDDIT_CLIENT_ID")
+
+    val redditClientSecret: String
+        get() = get("REDDIT_CLIENT_SECRET")
+
     private fun get(name: String) = env[name].orEmpty()
 }
