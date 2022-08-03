@@ -6,8 +6,7 @@ import erdmaschine.bot.model.Storage
 import kotlinx.coroutines.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.ChannelType
-import net.dv8tion.jda.api.entities.TextChannel
+import net.dv8tion.jda.api.entities.MessageChannel
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.Executors
@@ -36,7 +35,7 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
                     return@forEach
                 }
 
-                if (channel.type != ChannelType.TEXT) {
+                if (channel !is MessageChannel) {
                     return@forEach
                 }
 
@@ -64,7 +63,7 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
 
                 history.add(link.id)
 
-                (channel as TextChannel).sendMessageEmbeds(embed.build()).await()
+                (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
             }
 
             log.info("Runner finished, delaying for [$interval]ms")

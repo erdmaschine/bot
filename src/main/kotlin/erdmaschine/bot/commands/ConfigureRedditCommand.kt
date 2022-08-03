@@ -50,7 +50,7 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
     )
 
 suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandInteractionEvent) {
-    val channel = event.getOption(OPTION_CHANNEL)?.asTextChannel ?: throw Exception("Channel not valid")
+    val channel = event.getOption(OPTION_CHANNEL)?.asMessageChannel ?: throw Exception("Channel not valid")
     val owner = channel.guild.retrieveOwner().await()
     if (owner.user != event.user) {
         throw Exception("You are not authorized to configure reddit integration for that channel")
