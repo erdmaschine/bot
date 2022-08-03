@@ -1,7 +1,9 @@
 package erdmaschine.bot.reddit
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import erdmaschine.bot.Env
+import erdmaschine.bot.model.RedditListingThing
 import erdmaschine.bot.model.Token
 import okhttp3.*
 import org.slf4j.LoggerFactory
@@ -10,6 +12,8 @@ import java.util.*
 class RedditFacade(env: Env) {
 
     private val log = LoggerFactory.getLogger(this::class.java)!!
+
+    private val gson: Gson = GsonBuilder().create()
 
     private val userAgent = "java:erdmaschine:1.0.0"
     private val deviceId = UUID.randomUUID().toString()
@@ -26,6 +30,11 @@ class RedditFacade(env: Env) {
         })
         .followRedirects(false)
         .build()
+
+    fun fetchDeRising() = fetch("/r/de/rising").use { response ->
+        val body = response.body?.string().orEmpty()
+        gson.fromJson(body, RedditListingThing::class.java)
+    }
 
     private fun getToken(): Token {
         token?.let {
@@ -49,30 +58,29 @@ class RedditFacade(env: Env) {
 
         return client.newCall(request).execute().use { response ->
             val body = response.body?.string().orEmpty()
-            Gson().fromJson(body, Token::class.java)
-                .let {
-                    token = it
-                    it
-                }
+
+            if (!response.isSuccessful) {
+                throw Exception("Error getting reddit token: $body")
+            }
+
+            gson.fromJson(body, Token::class.java).also { token = it }
         }
     }
 
-    fun fetchListing() {
+    private fun fetch(path: String): Response {
         val token = getToken()
         val listing = Request.Builder()
-            .url("https://oauth.reddit.com/r/de/rising")
+            .url("https://oauth.reddit.com$path")
             .header("Authorization", "Bearer ${token.access_token}")
             .build()
-        client.newCall(listing).execute().use { response ->
-            val body = response.body?.string().orEmpty()
-            println(body)
-        }
+        return client.newCall(listing).execute()
     }
-
 }
 
 fun main() {
     val redditFacade = RedditFacade(Env())
-    val result = redditFacade.fetchListing()
-    println(result)
+    val result = redditFacade.fetchDeRising()
+    result.data.children
+        .map { it.data }
+        .forEach { println(it.title) }
 }

@@ -1,14 +1,22 @@
 package erdmaschine.bot.model
 
-data class Listing(
-    val before: String,
-    val after: String,
-    val
+data class RedditListingThing(
+    val data: RedditListing
 )
 
-data class Thing(
-    val id: String,
-    val name: String,
-    val kind: String,
-    val data: List<Thing>
+data class RedditListing(
+    val children: List<RedditLinkThing>
+)
+
+data class RedditLinkThing(
+    val data: RedditLink
+)
+
+data class RedditLink(
+    val title: String,
+    val author: String,
+    val ups: Long,
+    val downs: Long,
+    val url: String,
+    val permalink: String,
 )
