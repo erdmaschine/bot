@@ -30,10 +30,6 @@ fun main() = runBlocking {
             MemoryStorage()
         }
 
-        val redditFacade = RedditFacade(env)
-        val redditIntegrationRunner = RedditIntegrationRunner(env, storage, redditFacade)
-        redditIntegrationJob = redditIntegrationRunner.run()
-
         val commandListener = CommandListener(storage)
 
         val jda = JDABuilder.createDefault(env.authToken)
@@ -45,7 +41,11 @@ fun main() = runBlocking {
             .build()
 
         jda.awaitReady()
+
+        redditIntegrationJob = RedditIntegrationRunner(env).run(storage, RedditFacade(env), jda)
+
         commandListener.initCommands(jda, env)
+
         jda.presence.setPresence(Activity.watching("out for hot takes"), false)
     } catch (e: Exception) {
         redditIntegrationJob?.cancel()

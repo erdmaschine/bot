@@ -33,6 +33,7 @@ class RedditFacade(env: Env) {
         .build()
 
     fun fetch(sub: Sub): RedditListingThing {
+        // TODO cache listings per sub/listing
         val token = getToken()
         val listing = Request.Builder()
             .url("https://oauth.reddit.com/r/${sub.sub}/${sub.listing}")
