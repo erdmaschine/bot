@@ -118,7 +118,7 @@ class MemoryStorage : Storage {
 
     override suspend fun removeSub(guildId: String, channelId: String, sub: String) {
         log.info("Removing Sub[$sub] from Guild[${guildId}] in Channel[$channelId]")
-        redditSubs.removeIf { it.guildId === guildId && it.channelId === channelId && it.sub === sub }
+        redditSubs.removeIf { it.guildId == guildId && it.channelId == channelId && it.sub == sub }
     }
 
     override suspend fun getSubs(): Collection<Sub> {

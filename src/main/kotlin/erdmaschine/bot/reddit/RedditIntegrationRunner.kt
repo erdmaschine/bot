@@ -1,6 +1,7 @@
 package erdmaschine.bot.reddit
 
 import erdmaschine.bot.Env
+import erdmaschine.bot.await
 import erdmaschine.bot.model.Storage
 import kotlinx.coroutines.*
 import net.dv8tion.jda.api.EmbedBuilder
@@ -8,6 +9,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.TextChannel
 import org.slf4j.LoggerFactory
+import java.util.*
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
@@ -17,6 +19,7 @@ class RedditIntegrationRunner(env: Env) : CoroutineScope {
     private val job = Job()
     private val interval = env.redditRunnerInterval.ifEmpty { "60000" }.toLong()
     private val singleThreadExecutor = Executors.newSingleThreadExecutor()
+    private val history = HashSet<String>()
 
     override val coroutineContext: CoroutineContext
         get() = job + singleThreadExecutor.asCoroutineDispatcher()
@@ -31,22 +34,32 @@ class RedditIntegrationRunner(env: Env) : CoroutineScope {
                     log.warn("Invalid Sub[${sub.sub}/${sub.listing}] on Guild[${sub.guildId}] in Channel[${sub.channelId}]")
                     return@forEach
                 }
+
                 if (channel.type != ChannelType.TEXT) {
                     return@forEach
                 }
 
-                // TODO Timeout for reposts?
-                listingThing.data.children.map { it.data }.forEach { link ->
-                    (channel as TextChannel).sendMessageEmbeds(
-                        EmbedBuilder()
-                            .setAuthor(link.author)
-                            // TODO preview as thumbnail
-                            .setTitle(link.title, link.url)
-                            .setFooter("${sub.sub}/${sub.listing}")
-                            .build()
-                    )
-                        .submit()
-                }
+                val link = listingThing.data.children
+                    .map { it.data }
+                    .firstOrNull { !history.contains(it.id) }
+                    ?: return@forEach
+
+                val embed = EmbedBuilder()
+                    .setAuthor(link.author)
+                    .setTitle(link.title, "https://www.reddit.com${link.permalink}")
+                    .setFooter("${sub.sub}/${sub.listing}")
+                    .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
+
+                link.preview?.images
+                    ?.firstOrNull()
+                    ?.resolutions
+                    ?.firstOrNull { it.width in 300..600 }
+                    ?.url
+                    ?.let { embed.setImage(it.replace("&amp;", "&")) }
+
+                history.add(link.id)
+
+                (channel as TextChannel).sendMessageEmbeds(embed.build()).await()
             }
 
             log.info("Runner finished, delaying for [$interval]ms")

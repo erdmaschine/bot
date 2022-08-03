@@ -5,7 +5,7 @@ data class RedditListingThing(
 )
 
 data class RedditListing(
-    val children: List<RedditLinkThing>
+    val children: Collection<RedditLinkThing>
 )
 
 data class RedditLinkThing(
@@ -13,10 +13,24 @@ data class RedditLinkThing(
 )
 
 data class RedditLink(
+    val id: String,
+    val created: Float,
     val title: String,
     val author: String,
-    val ups: Long,
-    val downs: Long,
-    val url: String,
     val permalink: String,
+    val preview: RedditPreview?,
+)
+
+data class RedditPreview(
+    val images: Collection<RedditPreviewImages>
+)
+
+data class RedditPreviewImages(
+    val resolutions: Collection<RedditPreviewImageResolutions>
+)
+
+data class RedditPreviewImageResolutions(
+    val url: String,
+    val width: Int,
+    val height: Int,
 )

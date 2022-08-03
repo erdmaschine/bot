@@ -52,16 +52,19 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
 suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandInteractionEvent) {
     val channel = event.getOption(OPTION_CHANNEL)?.asTextChannel ?: throw Exception("Channel not valid")
     val owner = channel.guild.retrieveOwner().await()
-    if (owner.user !== event.user) {
+    if (owner.user != event.user) {
         throw Exception("You are not authorized to configure reddit integration for that channel")
     }
 
     val sub = event.getOption(OPTION_SUB)?.asString ?: throw Exception("Sub option must be provided")
-    val listing = event.getOption(OPTION_LISTING)?.asString ?: throw Exception("Listing option must be provided")
+    val listing = event.getOption(OPTION_LISTING)?.asString
     var message = "Unknown result"
 
     when (event.subcommandName) {
         COMMAND_ADD_SUB -> {
+            if (listing == null) {
+                throw Exception("Listing option must be provided")
+            }
             storage.addSub(channel.guild.id, channel.id, sub, listing)
             message = "Sub[$sub/$listing] was added!"
         }
