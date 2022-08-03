@@ -29,5 +29,8 @@ class Env {
     val redditRunnerInterval: String
         get() = get("REDDIT_RUNNER_INTERVAL")
 
+    val redditRunnerHistorySize: String
+        get() = get("REDDIT_RUNNER_HISTORY_SIZE")
+
     private fun get(name: String) = env[name].orEmpty()
 }

@@ -13,13 +13,13 @@ import java.util.*
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
-class RedditIntegrationRunner(env: Env) : CoroutineScope {
+class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
 
     private val log = LoggerFactory.getLogger(this::class.java)!!
     private val job = Job()
     private val interval = env.redditRunnerInterval.ifEmpty { "60000" }.toLong()
     private val singleThreadExecutor = Executors.newSingleThreadExecutor()
-    private val history = HashSet<String>()
+    private val history = mutableListOf<String>()
 
     override val coroutineContext: CoroutineContext
         get() = job + singleThreadExecutor.asCoroutineDispatcher()
@@ -27,11 +27,12 @@ class RedditIntegrationRunner(env: Env) : CoroutineScope {
     fun run(storage: Storage, redditFacade: RedditFacade, jda: JDA) = launch {
         while (isActive) {
             delay(interval)
+
             storage.getSubs().forEach { sub ->
                 val listingThing = redditFacade.fetch(sub)
                 val channel = jda.getGuildById(sub.guildId)?.getGuildChannelById(sub.channelId)
                 if (channel == null) {
-                    log.warn("Invalid Sub[${sub.sub}/${sub.listing}] on Guild[${sub.guildId}] in Channel[${sub.channelId}]")
+                    log.warn("Could not find Channel[${sub.channelId}] on Guild[${sub.guildId}] for Sub[${sub.sub}/${sub.listing}]")
                     return@forEach
                 }
 
@@ -56,6 +57,10 @@ class RedditIntegrationRunner(env: Env) : CoroutineScope {
                     ?.firstOrNull { it.width in 300..600 }
                     ?.url
                     ?.let { embed.setImage(it.replace("&amp;", "&")) }
+
+                if (history.size > env.redditRunnerHistorySize.ifEmpty { "25" }.toInt()) {
+                    history.removeFirst()
+                }
 
                 history.add(link.id)
 
