@@ -21,6 +21,12 @@ class DbStorage(env: Env) : Storage {
 
         Flyway.configure()
             .locations("classpath:migrations")
+            .dataSource(dataSource)
+            .load()
+            .repair()
+
+        Flyway.configure()
+            .locations("classpath:migrations")
             .baselineOnMigrate(true)
             .dataSource(dataSource)
             .load()
@@ -135,15 +141,31 @@ class DbStorage(env: Env) : Storage {
     }
 
     override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String) {
-        TODO("Not yet implemented")
+        log.info("Adding Sub[$sub/$listing] on [G:$guildId] in [C:$channelId]")
+        query(dataSource) {
+            Subs.insert {
+                it[Subs.guildId] = guildId
+                it[Subs.channelId] = channelId
+                it[Subs.sub] = sub
+                it[Subs.listing] = listing
+            }
+        }
     }
 
     override suspend fun removeSub(guildId: String, channelId: String, sub: String) {
-        TODO("Not yet implemented")
+        log.info("Removing Sub[$sub] on [G:$guildId] in [C:$channelId]")
+        query(dataSource) {
+            Subs.deleteWhere {
+                (Subs.guildId eq guildId) and (Subs.channelId eq channelId) and (Subs.sub eq sub)
+            }
+        }
     }
 
     override suspend fun getSubs(): Collection<Sub> {
-        TODO("Not yet implemented")
+        return query(dataSource) {
+            Subs.selectAll()
+                .map { Sub.fromResultRow(it) }
+        }
     }
 
     private suspend fun <T> query(dataSource: DataSource, block: () -> T): T =
