@@ -138,6 +138,18 @@ class DbStorage(env: Env) : Storage {
         }
     }
 
+    override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun removeSub(guildId: String, channelId: String, sub: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getSubs(): Collection<Sub> {
+        TODO("Not yet implemented")
+    }
+
     private suspend fun <T> query(dataSource: DataSource, block: () -> T): T =
         withContext(Dispatchers.IO) {
             transaction(Database.connect(dataSource)) {

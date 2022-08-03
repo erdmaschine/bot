@@ -26,5 +26,8 @@ class Env {
     val redditClientSecret: String
         get() = get("REDDIT_CLIENT_SECRET")
 
+    val redditRunnerInterval: String
+        get() = get("REDDIT_RUNNER_INTERVAL")
+
     private fun get(name: String) = env[name].orEmpty()
 }

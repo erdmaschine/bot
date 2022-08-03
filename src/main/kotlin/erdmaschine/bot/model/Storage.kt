@@ -16,4 +16,8 @@ interface Storage {
     suspend fun increaseUsed(fav: Fav)
     suspend fun upvote(fav: Fav)
     suspend fun downvote(fav: Fav)
+
+    suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String)
+    suspend fun removeSub(guildId: String, channelId: String, sub: String)
+    suspend fun getSubs(): Collection<Sub>
 }

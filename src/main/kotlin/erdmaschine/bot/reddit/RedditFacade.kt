@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import erdmaschine.bot.Env
 import erdmaschine.bot.model.RedditListingThing
+import erdmaschine.bot.model.Sub
 import erdmaschine.bot.model.Token
 import okhttp3.*
 import org.slf4j.LoggerFactory
@@ -31,9 +32,16 @@ class RedditFacade(env: Env) {
         .followRedirects(false)
         .build()
 
-    fun fetchDeRising() = fetch("/r/de/rising").use { response ->
-        val body = response.body?.string().orEmpty()
-        gson.fromJson(body, RedditListingThing::class.java)
+    fun fetch(sub: Sub): RedditListingThing {
+        val token = getToken()
+        val listing = Request.Builder()
+            .url("https://oauth.reddit.com/r/${sub.sub}/${sub.listing}")
+            .header("Authorization", "Bearer ${token.access_token}")
+            .build()
+        return client.newCall(listing).execute().use { response ->
+            val body = response.body?.string().orEmpty()
+            gson.fromJson(body, RedditListingThing::class.java)
+        }
     }
 
     private fun getToken(): Token {
@@ -66,21 +74,4 @@ class RedditFacade(env: Env) {
             gson.fromJson(body, Token::class.java).also { token = it }
         }
     }
-
-    private fun fetch(path: String): Response {
-        val token = getToken()
-        val listing = Request.Builder()
-            .url("https://oauth.reddit.com$path")
-            .header("Authorization", "Bearer ${token.access_token}")
-            .build()
-        return client.newCall(listing).execute()
-    }
-}
-
-fun main() {
-    val redditFacade = RedditFacade(Env())
-    val result = redditFacade.fetchDeRising()
-    result.data.children
-        .map { it.data }
-        .forEach { println(it.title) }
 }

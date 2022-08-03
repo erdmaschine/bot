@@ -20,6 +20,7 @@ private val slashCommandData = listOf(
     StatsCommand,
     GuildStatsCommand,
     MysteryFavCommand,
+    ConfigureRedditCommand,
 )
 
 @ExperimentalTime
@@ -51,6 +52,7 @@ class CommandListener(
                 StatsCommand.name -> executeStatsCommand(storage, event)
                 GuildStatsCommand.name -> executeGuildStats(storage, event)
                 MysteryFavCommand.name -> executeMysteryFavCommand(storage, event)
+                ConfigureRedditCommand.name -> executeConfigureRedditCommand(storage, event)
                 else -> Unit
             }
         } catch (e: Exception) {

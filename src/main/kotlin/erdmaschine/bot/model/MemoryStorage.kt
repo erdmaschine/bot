@@ -7,7 +7,8 @@ val autoIncrementId = AtomicInteger(1)
 
 class MemoryStorage : Storage {
     private val log = LoggerFactory.getLogger(this::class.java)!!
-    private val storage = ArrayList<Fav>()
+    private val favs = HashMap<String, Fav>()
+    private val redditSubs = HashSet<Sub>()
 
     override suspend fun saveNewFav(
         userId: String,
@@ -28,13 +29,13 @@ class MemoryStorage : Storage {
             0,
             0,
         )
-        storage.add(fav)
+        favs[fav.id] = fav
         return fav.id
     }
 
     override suspend fun getFavs(userId: String?, guildId: String?, tags: Collection<String>): List<Fav> {
         log.info("Getting favs for User[$userId] Guild[$guildId] Tags$tags")
-        return storage
+        return favs.values
             .filter { userId == null || it.userId == userId }
             .filter { guildId == null || it.guildId == guildId }
             .filter { tags.isEmpty() || it.tags.any { tag -> tags.contains(tag.lowercase()) } }
@@ -42,90 +43,85 @@ class MemoryStorage : Storage {
 
     override suspend fun removeFav(favId: String) {
         log.info("Removing Fav[$favId]")
-        storage.removeAll { it.id == favId }
+        favs.remove(favId)
     }
 
     override suspend fun writeTags(favId: String, tags: Collection<String>) {
         log.info("Setting tags of Fav[$favId] to $tags")
-        storage.replaceAll {
-            when (it.id) {
-                favId -> Fav(
-                    it.id,
-                    it.userId,
-                    it.guildId,
-                    it.channelId,
-                    it.messageId,
-                    it.authorId,
-                    tags,
-                    it.used,
-                    it.votes,
-                )
-                else -> it
-            }
-        }
+        val fav = getFav(favId) ?: return
+        favs[fav.id] = Fav(
+            fav.id,
+            fav.userId,
+            fav.guildId,
+            fav.channelId,
+            fav.messageId,
+            fav.authorId,
+            tags,
+            fav.used,
+            fav.votes
+        )
     }
 
     override suspend fun getFav(favId: String): Fav? {
         log.info("Fetching Fav[$favId]")
-        return storage.firstOrNull { it.id == favId }
+        return favs[favId]
     }
 
     override suspend fun increaseUsed(fav: Fav) {
-        storage.replaceAll {
-            when (it.id) {
-                fav.id -> Fav(
-                    it.id,
-                    it.userId,
-                    it.guildId,
-                    it.channelId,
-                    it.messageId,
-                    it.authorId,
-                    it.tags,
-                    it.used + 1,
-                    it.votes
-                )
-                else -> it
-            }
-        }
+        favs[fav.id] = Fav(
+            fav.id,
+            fav.userId,
+            fav.guildId,
+            fav.channelId,
+            fav.messageId,
+            fav.authorId,
+            fav.tags,
+            fav.used + 1,
+            fav.votes
+        )
     }
 
     override suspend fun upvote(fav: Fav) {
         log.info("Upvoting Fav[${fav.id}]")
-        storage.replaceAll {
-            when (it.id) {
-                fav.id -> Fav(
-                    it.id,
-                    it.userId,
-                    it.guildId,
-                    it.channelId,
-                    it.messageId,
-                    it.authorId,
-                    it.tags,
-                    it.used,
-                    it.votes + 1,
-                )
-                else -> it
-            }
-        }
+        favs[fav.id] = Fav(
+            fav.id,
+            fav.userId,
+            fav.guildId,
+            fav.channelId,
+            fav.messageId,
+            fav.authorId,
+            fav.tags,
+            fav.used,
+            fav.votes + 1
+        )
     }
 
     override suspend fun downvote(fav: Fav) {
         log.info("Downvoting Fav[${fav.id}]")
-        storage.replaceAll {
-            when (it.id) {
-                fav.id -> Fav(
-                    it.id,
-                    it.userId,
-                    it.guildId,
-                    it.channelId,
-                    it.messageId,
-                    it.authorId,
-                    it.tags,
-                    it.used,
-                    it.votes - 1,
-                )
-                else -> it
-            }
-        }
+        favs[fav.id] = Fav(
+            fav.id,
+            fav.userId,
+            fav.guildId,
+            fav.channelId,
+            fav.messageId,
+            fav.authorId,
+            fav.tags,
+            fav.used - 1,
+            fav.votes
+        )
+    }
+
+    override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String) {
+        log.info("Adding new Sub[$sub/$listing] for Guild[$guildId] in Channel[$channelId]")
+        redditSubs.add(Sub(guildId, channelId, sub, listing))
+    }
+
+    override suspend fun removeSub(guildId: String, channelId: String, sub: String) {
+        log.info("Removing Sub[$sub] from Guild[${guildId}] in Channel[$channelId]")
+        redditSubs.removeIf { it.guildId === guildId && it.channelId === channelId && it.sub === sub }
+    }
+
+    override suspend fun getSubs(): Collection<Sub> {
+        return redditSubs
     }
 }
