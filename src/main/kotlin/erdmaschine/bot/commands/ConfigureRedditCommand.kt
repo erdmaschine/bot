@@ -53,7 +53,7 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
 
 suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandInteractionEvent) {
     val channel = event.getOption(OPTION_CHANNEL)?.asMessageChannel ?: throw Exception("Invalid channel type")
-    if (PermissionUtil.checkPermission(channel.permissionContainer, event.member, Permission.MESSAGE_MANAGE)) {
+    if (!PermissionUtil.checkPermission(channel.permissionContainer, event.member, Permission.MESSAGE_MANAGE)) {
         throw Exception("You are not authorized to configure reddit integration for that channel")
     }
 

@@ -45,13 +45,15 @@ class RedditFacade(env: Env) {
                 .url("https://oauth.reddit.com${sub.link}")
                 .header("Authorization", "Bearer ${token.access_token}")
                 .build()
+
             client.newCall(listing).execute().use { response ->
                 val body = response.body?.string().orEmpty()
 
                 if (!response.isSuccessful) {
-                    throw Exception("Error getting reddit listing: $body")
+                    throw Exception("Error fetching listing [${sub.link}]: $body")
                 }
 
+                log.info("Fetched [${sub.link}]")
                 result[sub.link] = gson.fromJson(body, RedditListingThing::class.java)
             }
         }
