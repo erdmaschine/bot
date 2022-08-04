@@ -111,9 +111,9 @@ class MemoryStorage : Storage {
         )
     }
 
-    override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String) {
+    override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String, nsfw: Boolean) {
         log.info("Adding new Sub[$sub/$listing] for Guild[$guildId] in Channel[$channelId]")
-        redditSubs.add(Sub(guildId, channelId, sub, listing))
+        redditSubs.add(Sub(guildId, channelId, sub, listing, nsfw))
     }
 
     override suspend fun removeSub(guildId: String, channelId: String, sub: String) {

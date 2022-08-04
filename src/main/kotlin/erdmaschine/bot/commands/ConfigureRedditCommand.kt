@@ -15,6 +15,7 @@ private const val COMMAND_REMOVE_SUB = "remove-sub"
 private const val OPTION_SUB = "sub"
 private const val OPTION_LISTING = "listing"
 private const val OPTION_CHANNEL = "channel"
+private const val OPTION_NSFW = "nsfw"
 
 val subOption = OptionData(
     OptionType.STRING,
@@ -34,7 +35,8 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
     .addSubcommands(
         SubcommandData(COMMAND_ADD_SUB, "Add a new source subreddit")
             .addOptions(
-                channelOption, subOption,
+                channelOption,
+                subOption,
                 OptionData(
                     OptionType.STRING,
                     OPTION_LISTING,
@@ -44,7 +46,8 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
                     .addChoice("hot", "hot")
                     .addChoice("rising", "rising")
                     .addChoice("controversial", "controversial")
-                    .addChoice("new", "new")
+                    .addChoice("new", "new"),
+                OptionData(OptionType.BOOLEAN, OPTION_NSFW, "Allow NSFW posts")
             ),
         SubcommandData(COMMAND_REMOVE_SUB, "Remove a source subreddit")
             .addOptions(channelOption, subOption),
@@ -58,11 +61,12 @@ suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandI
 
     val sub = event.getOption(OPTION_SUB)?.asString ?: throw Exception("Sub option must be provided")
     val listing = event.getOption(OPTION_LISTING)?.asString?.ifBlank { "rising" } ?: "rising"
+    val nsfw = event.getOption(OPTION_NSFW)?.asBoolean ?: false
     var message = "Unknown result"
 
     when (event.subcommandName) {
         COMMAND_ADD_SUB -> {
-            storage.addSub(channel.guild.id, channel.id, sub, listing)
+            storage.addSub(channel.guild.id, channel.id, sub, listing, nsfw)
             message = "Done"
         }
 

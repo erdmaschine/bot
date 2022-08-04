@@ -8,6 +8,7 @@ data class Sub(
     val channelId: String,
     val sub: String,
     val listing: String,
+    val nsfw: Boolean,
 ) {
     val link = "/r/$sub/$listing"
     val channelKey = "$guildId/$channelId"
@@ -21,6 +22,7 @@ data class Sub(
                 resultRow[Subs.channelId],
                 resultRow[Subs.sub],
                 resultRow[Subs.listing],
+                resultRow[Subs.nsfw],
             )
     }
 
@@ -34,6 +36,7 @@ object Subs : Table() {
     val channelId = varchar("channelId", 100)
     val sub = varchar("sub", 100)
     val listing = varchar("listing", 100)
+    val nsfw = bool("nsfw")
 
     override val primaryKey = PrimaryKey(guildId, channelId, sub)
 }

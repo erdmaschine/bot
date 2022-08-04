@@ -140,7 +140,7 @@ class DbStorage(env: Env) : Storage {
         }
     }
 
-    override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String) {
+    override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String, nsfw: Boolean) {
         log.info("Adding Sub[$sub/$listing] on [G:$guildId] in [C:$channelId]")
         query(dataSource) {
             Subs.insert {
@@ -148,6 +148,7 @@ class DbStorage(env: Env) : Storage {
                 it[Subs.channelId] = channelId
                 it[Subs.sub] = sub
                 it[Subs.listing] = listing
+                it[Subs.nsfw] = nsfw
             }
         }
     }

@@ -7,7 +7,6 @@ import erdmaschine.bot.model.DbStorage
 import erdmaschine.bot.model.MemoryStorage
 import erdmaschine.bot.reddit.RedditFacade
 import erdmaschine.bot.reddit.RedditIntegrationRunner
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -18,7 +17,7 @@ import kotlin.time.ExperimentalTime
 fun main() = runBlocking {
     val env = Env()
     val log = LoggerFactory.getLogger("erdmaschine.bot.Main")!!
-    var redditIntegrationJob: Job? = null
+    val redditIntegrationRunner = RedditIntegrationRunner(env)
 
     try {
         log.info("Starting up erdmaschine-bot")
@@ -42,13 +41,15 @@ fun main() = runBlocking {
 
         jda.awaitReady()
 
-        redditIntegrationJob = RedditIntegrationRunner(env).run(storage, RedditFacade(env), jda)
+        redditIntegrationRunner.run(storage, RedditFacade(env), jda)
 
         commandListener.initCommands(jda, env)
 
         jda.presence.setPresence(Activity.watching("out for hot takes"), false)
+
+        log.info("Ready for action")
     } catch (e: Exception) {
-        redditIntegrationJob?.cancel()
+        redditIntegrationRunner.stop()
         log.error(e.message, e)
     }
 }
