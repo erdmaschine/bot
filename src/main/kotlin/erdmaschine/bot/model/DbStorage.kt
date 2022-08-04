@@ -13,7 +13,7 @@ import javax.sql.DataSource
 class DbStorage(env: Env) : Storage {
 
     private val log = LoggerFactory.getLogger(this::class.java)!!
-    private val dataSource = HikariDataSource().also { it.jdbcUrl = "jdbc:${env.dbUrl}" }
+    private val dataSource = HikariDataSource().also { it.jdbcUrl = env.dbUrl }
 
     init {
         // Fetch a connection immediately, so it's ready as soon as the class is loaded
