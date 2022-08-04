@@ -6,5 +6,5 @@ data class Sub(
     val sub: String,
     val listing: String,
 ) {
-    val key = "$sub/$listing"
+    val link = "/r/$sub/$listing"
 }

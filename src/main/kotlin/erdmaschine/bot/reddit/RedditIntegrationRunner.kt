@@ -42,7 +42,7 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
                     return@forEach
                 }
 
-                val listingThing = listingThings[sub.key] ?: return@forEach
+                val listingThing = listingThings[sub.link] ?: return@forEach
 
                 val link = listingThing.data.children
                     .map { it.data }
@@ -53,7 +53,7 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
                 val embed = EmbedBuilder()
                     .setAuthor(link.author)
                     .setTitle(link.title, "https://www.reddit.com${link.permalink}")
-                    .setFooter("${sub.sub}/${sub.listing}")
+                    .setFooter(sub.link)
                     .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
                     .setDescription(
                         when (link.is_self) {

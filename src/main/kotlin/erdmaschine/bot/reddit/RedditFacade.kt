@@ -36,13 +36,13 @@ class RedditFacade(env: Env) {
         val result = mutableMapOf<String, RedditListingThing>()
 
         subs.forEach { sub ->
-            if (result.containsKey(sub.key)) {
+            if (result.containsKey(sub.link)) {
                 return@forEach
             }
 
             val token = getToken()
             val listing = Request.Builder()
-                .url("https://oauth.reddit.com/r/${sub.sub}/${sub.listing}")
+                .url("https://oauth.reddit.com${sub.link}")
                 .header("Authorization", "Bearer ${token.access_token}")
                 .build()
             client.newCall(listing).execute().use { response ->
@@ -52,7 +52,7 @@ class RedditFacade(env: Env) {
                     throw Exception("Error getting reddit listing: $body")
                 }
 
-                result[sub.key] = gson.fromJson(body, RedditListingThing::class.java)
+                result[sub.link] = gson.fromJson(body, RedditListingThing::class.java)
             }
         }
 
