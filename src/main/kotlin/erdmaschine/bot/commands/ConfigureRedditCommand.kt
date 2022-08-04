@@ -38,8 +38,7 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
                 OptionData(
                     OptionType.STRING,
                     OPTION_LISTING,
-                    "Subreddit listing type to use",
-                    true
+                    "Subreddit listing type to use (default: 'rising')"
                 )
                     .addChoice("top", "top")
                     .addChoice("hot", "hot")
@@ -58,14 +57,11 @@ suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandI
     }
 
     val sub = event.getOption(OPTION_SUB)?.asString ?: throw Exception("Sub option must be provided")
-    val listing = event.getOption(OPTION_LISTING)?.asString
+    val listing = event.getOption(OPTION_LISTING)?.asString?.ifBlank { "rising" } ?: "rising"
     var message = "Unknown result"
 
     when (event.subcommandName) {
         COMMAND_ADD_SUB -> {
-            if (listing == null) {
-                throw Exception("Listing option must be provided")
-            }
             storage.addSub(channel.guild.id, channel.id, sub, listing)
             message = "Done"
         }
