@@ -27,6 +27,7 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
         while (isActive) {
             delay(interval)
 
+            log.info("Starting runner")
 
             val subs = storage.getSubs()
             val listingThings = redditFacade.fetch(subs)
