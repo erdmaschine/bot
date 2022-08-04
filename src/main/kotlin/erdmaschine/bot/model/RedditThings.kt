@@ -20,6 +20,8 @@ data class RedditLink(
     val url: String,
     val permalink: String,
     val preview: RedditPreview?,
+    val is_self: Boolean,
+    val selftext: String,
 )
 
 data class RedditPreview(

@@ -53,9 +53,14 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
                 val embed = EmbedBuilder()
                     .setAuthor(link.author)
                     .setTitle(link.title, "https://www.reddit.com${link.permalink}")
-                    .setDescription(link.url)
                     .setFooter("${sub.sub}/${sub.listing}")
                     .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
+                    .setDescription(
+                        when (link.is_self) {
+                            true -> link.selftext.take(200)
+                            else -> link.url
+                        }
+                    )
 
                 link.preview?.images
                     ?.firstOrNull()
