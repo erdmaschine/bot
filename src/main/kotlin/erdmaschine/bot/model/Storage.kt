@@ -20,4 +20,7 @@ interface Storage {
     suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String, nsfw: Boolean)
     suspend fun removeSub(guildId: String, channelId: String, sub: String)
     suspend fun getSubs(): Collection<Sub>
+
+    suspend fun isInPostHistory(guildId: String, channelId: String, sub: String, postId: String): Boolean
+    suspend fun addPostHistory(guildId: String, channelId: String, sub: String, postId: String)
 }

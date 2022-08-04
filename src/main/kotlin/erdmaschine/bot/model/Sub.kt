@@ -11,7 +11,6 @@ data class Sub(
     val nsfw: Boolean,
 ) {
     val link = "/r/$sub/$listing"
-    val channelKey = "$guildId/$channelId"
 
     companion object {
 

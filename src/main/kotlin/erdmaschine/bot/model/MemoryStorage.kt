@@ -8,7 +8,8 @@ val autoIncrementId = AtomicInteger(1)
 class MemoryStorage : Storage {
     private val log = LoggerFactory.getLogger(this::class.java)!!
     private val favs = HashMap<String, Fav>()
-    private val redditSubs = HashSet<Sub>()
+    private val subs = HashSet<Sub>()
+    private val postHistory = HashMap<String, MutableSet<String>>()
 
     override suspend fun saveNewFav(
         userId: String,
@@ -113,15 +114,26 @@ class MemoryStorage : Storage {
 
     override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String, nsfw: Boolean) {
         log.info("Adding new Sub[$sub/$listing] for Guild[$guildId] in Channel[$channelId]")
-        redditSubs.add(Sub(guildId, channelId, sub, listing, nsfw))
+        subs.add(Sub(guildId, channelId, sub, listing, nsfw))
     }
 
     override suspend fun removeSub(guildId: String, channelId: String, sub: String) {
         log.info("Removing Sub[$sub] from Guild[${guildId}] in Channel[$channelId]")
-        redditSubs.removeIf { it.guildId == guildId && it.channelId == channelId && it.sub == sub }
+        subs.removeIf { it.guildId == guildId && it.channelId == channelId && it.sub == sub }
+        postHistory.remove("$guildId/$channelId/$sub")
     }
 
     override suspend fun getSubs(): Collection<Sub> {
-        return redditSubs
+        return subs
+    }
+
+    override suspend fun isInPostHistory(guildId: String, channelId: String, sub: String, postId: String): Boolean {
+        return postHistory["$guildId/$channelId/$sub"]?.contains(postId) ?: false
+    }
+
+    override suspend fun addPostHistory(guildId: String, channelId: String, sub: String, postId: String) {
+        val history = postHistory["$guildId/$channelId/$sub"] ?: mutableSetOf()
+        history.add(postId)
+        postHistory["$guildId/$channelId/$sub"] = history
     }
 }

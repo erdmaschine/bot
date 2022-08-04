@@ -18,7 +18,6 @@ class RedditIntegrationRunner(private val env: Env) {
     private val log = LoggerFactory.getLogger(this::class.java)!!
     private val scheduler = Executors.newScheduledThreadPool(1)
     private val interval = env.redditRunnerInterval.ifEmpty { "60000" }.toLong()
-    private val history = mutableMapOf<String, MutableList<String>>()
 
     fun run(storage: Storage, redditFacade: RedditFacade, jda: JDA) {
         scheduler.scheduleAtFixedRate(Runnable {
@@ -55,11 +54,9 @@ class RedditIntegrationRunner(private val env: Env) {
 
             val listingThing = listingThings[sub.link] ?: return@forEach
 
-            val channelHistory = history[sub.channelKey] ?: mutableListOf()
-
             val link = listingThing.data.children
                 .map { it.data }
-                .filter { !channelHistory.contains(it.id) }
+                .filter { !storage.isInPostHistory(sub.guildId, sub.channelId, sub.sub, it.id) }
                 .randomOrNull()
                 ?: return@forEach
 
@@ -82,12 +79,7 @@ class RedditIntegrationRunner(private val env: Env) {
                 ?.url
                 ?.let { embed.setImage(it.replace("&amp;", "&")) }
 
-            if (channelHistory.size > env.redditRunnerHistorySize.ifEmpty { "25" }.toInt()) {
-                channelHistory.removeFirst()
-            }
-
-            channelHistory.add(link.id)
-            history[sub.channelKey] = channelHistory
+            storage.addPostHistory(sub.guildId, sub.channelId, sub.sub, link.id)
 
             (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
         }

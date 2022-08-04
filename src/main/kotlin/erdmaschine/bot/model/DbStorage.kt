@@ -42,7 +42,7 @@ class DbStorage(env: Env) : Storage {
     ): String {
         log.info("Creating fav for User[$userId] Guild[$guildId] Channel[$channelId] Message[$messageId]")
         val favId = query(dataSource) {
-            Favs.insert {
+            Favs.insertIgnore {
                 it[Favs.userId] = userId
                 it[Favs.guildId] = guildId
                 it[Favs.channelId] = channelId
@@ -143,7 +143,7 @@ class DbStorage(env: Env) : Storage {
     override suspend fun addSub(guildId: String, channelId: String, sub: String, listing: String, nsfw: Boolean) {
         log.info("Adding Sub[$sub/$listing] on [G:$guildId] in [C:$channelId]")
         query(dataSource) {
-            Subs.insert {
+            Subs.insertIgnore {
                 it[Subs.guildId] = guildId
                 it[Subs.channelId] = channelId
                 it[Subs.sub] = sub
@@ -157,7 +157,15 @@ class DbStorage(env: Env) : Storage {
         log.info("Removing Sub[$sub] on [G:$guildId] in [C:$channelId]")
         query(dataSource) {
             Subs.deleteWhere {
-                (Subs.guildId eq guildId) and (Subs.channelId eq channelId) and (Subs.sub eq sub)
+                (Subs.guildId eq guildId) and
+                        (Subs.channelId eq channelId) and
+                        (Subs.sub eq sub)
+            }
+
+            PostHistories.deleteWhere {
+                (PostHistories.guildId eq guildId) and
+                        (PostHistories.channelId eq channelId) and
+                        (PostHistories.sub eq sub)
             }
         }
     }
@@ -166,6 +174,28 @@ class DbStorage(env: Env) : Storage {
         return query(dataSource) {
             Subs.selectAll()
                 .map { Sub.fromResultRow(it) }
+        }
+    }
+
+    override suspend fun isInPostHistory(guildId: String, channelId: String, sub: String, postId: String): Boolean {
+        return query(dataSource) {
+            PostHistories.select {
+                (PostHistories.guildId eq guildId) and
+                        (PostHistories.channelId eq channelId) and
+                        (PostHistories.sub eq sub) and
+                        (PostHistories.postId eq postId)
+            }.count() > 0
+        }
+    }
+
+    override suspend fun addPostHistory(guildId: String, channelId: String, sub: String, postId: String) {
+        query(dataSource) {
+            PostHistories.insertIgnore {
+                it[PostHistories.guildId] = guildId
+                it[PostHistories.channelId] = channelId
+                it[PostHistories.sub] = sub
+                it[PostHistories.postId] = postId
+            }
         }
     }
 
