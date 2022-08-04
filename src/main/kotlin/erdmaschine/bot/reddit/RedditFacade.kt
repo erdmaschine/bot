@@ -32,17 +32,31 @@ class RedditFacade(env: Env) {
         .followRedirects(false)
         .build()
 
-    fun fetch(sub: Sub): RedditListingThing {
-        // TODO cache listings per sub/listing
-        val token = getToken()
-        val listing = Request.Builder()
-            .url("https://oauth.reddit.com/r/${sub.sub}/${sub.listing}")
-            .header("Authorization", "Bearer ${token.access_token}")
-            .build()
-        return client.newCall(listing).execute().use { response ->
-            val body = response.body?.string().orEmpty()
-            gson.fromJson(body, RedditListingThing::class.java)
+    fun fetch(subs: Collection<Sub>): Map<String, RedditListingThing> {
+        val result = mutableMapOf<String, RedditListingThing>()
+
+        subs.forEach { sub ->
+            if (result.containsKey(sub.key)) {
+                return@forEach
+            }
+
+            val token = getToken()
+            val listing = Request.Builder()
+                .url("https://oauth.reddit.com/r/${sub.sub}/${sub.listing}")
+                .header("Authorization", "Bearer ${token.access_token}")
+                .build()
+            client.newCall(listing).execute().use { response ->
+                val body = response.body?.string().orEmpty()
+
+                if (!response.isSuccessful) {
+                    throw Exception("Error getting reddit listing: $body")
+                }
+
+                result[sub.key] = gson.fromJson(body, RedditListingThing::class.java)
+            }
         }
+
+        return result
     }
 
     private fun getToken(): Token {

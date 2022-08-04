@@ -5,4 +5,6 @@ data class Sub(
     val channelId: String,
     val sub: String,
     val listing: String,
-)
+) {
+    val key = "$sub/$listing"
+}

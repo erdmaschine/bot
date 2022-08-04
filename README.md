@@ -1,11 +1,12 @@
 # 📗 erdmaschine-bot
 
-A custom discord bot that provides many different functions.
+A custom discord bot that provides various functions.
 
 ## 🛠 Features
 
-* Favs
-* ...
+* Favs: Save and tag messages to post them at a later time
+* Quote: Quote messages via message link
+* Reddit listings: Automatically post reddit submissions
 
 ## 👀 Invite
 

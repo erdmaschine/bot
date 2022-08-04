@@ -27,11 +27,14 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
         while (isActive) {
             delay(interval)
 
-            storage.getSubs().forEach { sub ->
-                val listingThing = redditFacade.fetch(sub)
+
+            val subs = storage.getSubs()
+            val listingThings = redditFacade.fetch(subs)
+
+            subs.forEach { sub ->
                 val channel = jda.getGuildById(sub.guildId)?.getGuildChannelById(sub.channelId)
                 if (channel == null) {
-                    log.warn("Could not find Channel[${sub.channelId}] on Guild[${sub.guildId}] for Sub[${sub.sub}/${sub.listing}]")
+                    log.warn("Could not channel for $sub")
                     return@forEach
                 }
 
@@ -39,14 +42,18 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
                     return@forEach
                 }
 
+                val listingThing = listingThings[sub.key] ?: return@forEach
+
                 val link = listingThing.data.children
                     .map { it.data }
-                    .firstOrNull { !history.contains(it.id) }
+                    .filter { !history.contains(it.id) }
+                    .randomOrNull()
                     ?: return@forEach
 
                 val embed = EmbedBuilder()
                     .setAuthor(link.author)
                     .setTitle(link.title, "https://www.reddit.com${link.permalink}")
+                    .setDescription(link.url)
                     .setFooter("${sub.sub}/${sub.listing}")
                     .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
 

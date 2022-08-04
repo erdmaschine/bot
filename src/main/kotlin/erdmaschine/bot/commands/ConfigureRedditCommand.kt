@@ -2,11 +2,13 @@ package erdmaschine.bot.commands
 
 import erdmaschine.bot.await
 import erdmaschine.bot.model.Storage
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
+import net.dv8tion.jda.internal.utils.PermissionUtil
 
 private const val COMMAND_ADD_SUB = "add-sub"
 private const val COMMAND_REMOVE_SUB = "remove-sub"
@@ -50,9 +52,8 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
     )
 
 suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandInteractionEvent) {
-    val channel = event.getOption(OPTION_CHANNEL)?.asMessageChannel ?: throw Exception("Channel not valid")
-    val owner = channel.guild.retrieveOwner().await()
-    if (owner.user != event.user) {
+    val channel = event.getOption(OPTION_CHANNEL)?.asMessageChannel ?: throw Exception("Invalid channel type")
+    if (PermissionUtil.checkPermission(channel.permissionContainer, event.member, Permission.MESSAGE_MANAGE)) {
         throw Exception("You are not authorized to configure reddit integration for that channel")
     }
 
@@ -66,12 +67,12 @@ suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandI
                 throw Exception("Listing option must be provided")
             }
             storage.addSub(channel.guild.id, channel.id, sub, listing)
-            message = "Sub[$sub/$listing] was added!"
+            message = "Sub[$sub/$listing] added"
         }
 
         COMMAND_REMOVE_SUB -> {
             storage.removeSub(channel.guild.id, channel.id, sub)
-            message = "Sub[$sub] was removed!"
+            message = "Sub[$sub/$listing] removed"
         }
     }
 
