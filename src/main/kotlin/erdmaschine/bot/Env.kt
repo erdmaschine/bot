@@ -6,13 +6,7 @@ class Env {
     private val env = Dotenv.configure().ignoreIfMissing().load()!!
 
     val dbUrl: String
-        get() = get("DB_URL")
-
-    val dbUser: String
-        get() = get("DB_USER")
-
-    val dbPassword: String
-        get() = get("DB_PASSWORD")
+        get() = get("DATABASE_URL")
 
     val authToken: String
         get() = get("AUTH_TOKEN")
