@@ -55,9 +55,11 @@ class RedditIntegrationRunner(private val env: Env) {
 
             val listingThing = listingThings[sub.link] ?: return@forEach
 
+            val channelHistory = history[sub.channelKey] ?: mutableListOf()
+
             val link = listingThing.data.children
                 .map { it.data }
-                .filter { !history.contains(it.id) }
+                .filter { !channelHistory.contains(it.id) }
                 .randomOrNull()
                 ?: return@forEach
 
@@ -80,8 +82,6 @@ class RedditIntegrationRunner(private val env: Env) {
                 ?.url
                 ?.let { embed.setImage(it.replace("&amp;", "&")) }
 
-            val channelHistory = history[sub.channelKey] ?: mutableListOf()
-
             if (channelHistory.size > env.redditRunnerHistorySize.ifEmpty { "25" }.toInt()) {
                 channelHistory.removeFirst()
             }
@@ -90,8 +90,8 @@ class RedditIntegrationRunner(private val env: Env) {
             history[sub.channelKey] = channelHistory
 
             (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
-
-            log.info("Runner finished, next run in [$interval]ms")
         }
+
+        log.info("Runner finished, next run in [$interval]ms")
     }
 }
