@@ -27,9 +27,13 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
         while (isActive) {
             delay(interval)
 
-            log.info("Starting runner")
-
             val subs = storage.getSubs()
+
+            if (subs.isEmpty()) {
+                continue
+            }
+
+            log.info("Starting runner fetch for [${subs.size}] subs")
             val listingThings = redditFacade.fetch(subs)
 
             subs.forEach { sub ->
@@ -80,9 +84,9 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
                 history[sub.channelKey] = channelHistory
 
                 (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
-            }
 
-            log.info("Runner finished, delaying for [$interval]ms")
+                log.info("Runner finished, next run in [$interval]ms")
+            }
         }
     }
 }
