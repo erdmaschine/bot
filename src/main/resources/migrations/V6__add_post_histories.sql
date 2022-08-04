@@ -1,4 +1,4 @@
-create table if not exists post_history
+create table if not exists posthistories
 (
     "guildId"   varchar(100) not null,
     "channelId" varchar(100) not null,
