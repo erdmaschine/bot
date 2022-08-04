@@ -10,6 +10,7 @@ data class Sub(
     val listing: String,
 ) {
     val link = "/r/$sub/$listing"
+    val channelKey = "$guildId/$channelId"
 
     companion object {
 

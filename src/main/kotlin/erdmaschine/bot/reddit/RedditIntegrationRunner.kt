@@ -18,7 +18,7 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
     private val job = Job()
     private val interval = env.redditRunnerInterval.ifEmpty { "60000" }.toLong()
     private val singleThreadExecutor = Executors.newSingleThreadExecutor()
-    private val history = mutableListOf<String>()
+    private val history = mutableMapOf<String, MutableList<String>>()
 
     override val coroutineContext: CoroutineContext
         get() = job + singleThreadExecutor.asCoroutineDispatcher()
@@ -70,11 +70,14 @@ class RedditIntegrationRunner(private val env: Env) : CoroutineScope {
                     ?.url
                     ?.let { embed.setImage(it.replace("&amp;", "&")) }
 
-                if (history.size > env.redditRunnerHistorySize.ifEmpty { "25" }.toInt()) {
-                    history.removeFirst()
+                val channelHistory = history[sub.channelKey] ?: mutableListOf()
+
+                if (channelHistory.size > env.redditRunnerHistorySize.ifEmpty { "25" }.toInt()) {
+                    channelHistory.removeFirst()
                 }
 
-                history.add(link.id)
+                channelHistory.add(link.id)
+                history[sub.channelKey] = channelHistory
 
                 (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
             }

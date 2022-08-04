@@ -67,12 +67,12 @@ suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandI
                 throw Exception("Listing option must be provided")
             }
             storage.addSub(channel.guild.id, channel.id, sub, listing)
-            message = "Sub[$sub/$listing] added"
+            message = "Done"
         }
 
         COMMAND_REMOVE_SUB -> {
             storage.removeSub(channel.guild.id, channel.id, sub)
-            message = "Sub[$sub/$listing] removed"
+            message = "Done"
         }
     }
 
