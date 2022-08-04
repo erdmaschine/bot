@@ -63,7 +63,7 @@ class RedditIntegrationRunner(private val env: Env) {
 
             val embed = EmbedBuilder()
                 .setAuthor(link.author)
-                .setTitle(link.title, "https://www.reddit.com${link.permalink}")
+                .setTitle(link.title.take(200), "https://www.reddit.com${link.permalink}")
                 .setFooter(sub.link)
                 .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
                 .setDescription(
