@@ -27,6 +27,7 @@ jobs:
           name: target
           path: |
             fly.toml
+            Dockerfile
             target/
 
   deploy:
