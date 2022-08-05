@@ -1,1 +1,4 @@
 app = "erdmaschine"
+
+[env]
+DEPLOY_COMMANDS_GLOBAL = "true"
