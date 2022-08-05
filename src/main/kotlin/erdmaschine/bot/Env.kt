@@ -26,5 +26,8 @@ class Env {
     val redditRunnerHistorySize: String
         get() = get("REDDIT_RUNNER_HISTORY_SIZE")
 
+    val redditPostHistoryThreshold: String
+        get() = get("REDDIT_POSTHISTORY_THRESHOLD")
+
     private fun get(name: String) = env[name].orEmpty()
 }

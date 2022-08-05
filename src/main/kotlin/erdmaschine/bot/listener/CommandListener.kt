@@ -4,6 +4,7 @@ import erdmaschine.bot.Env
 import erdmaschine.bot.await
 import erdmaschine.bot.commands.*
 import erdmaschine.bot.model.Storage
+import erdmaschine.bot.reddit.RedditFacade
 import erdmaschine.bot.replyError
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
@@ -25,7 +26,8 @@ private val slashCommandData = listOf(
 
 @ExperimentalTime
 class CommandListener(
-    private val storage: Storage
+    private val storage: Storage,
+    private val redditFacade: RedditFacade
 ) : ListenerAdapter() {
 
     private val log = LoggerFactory.getLogger(this::class.java)!!
@@ -52,7 +54,7 @@ class CommandListener(
                 StatsCommand.name -> executeStatsCommand(storage, event)
                 GuildStatsCommand.name -> executeGuildStats(storage, event)
                 MysteryFavCommand.name -> executeMysteryFavCommand(storage, event)
-                ConfigureRedditCommand.name -> executeConfigureRedditCommand(storage, event)
+                ConfigureRedditCommand.name -> executeConfigureRedditCommand(storage, redditFacade, event)
                 else -> Unit
             }
         } catch (e: Exception) {

@@ -13,7 +13,7 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class RedditIntegrationRunner(private val env: Env) {
+class RedditIntegrationRunner(env: Env) {
 
     private val log = LoggerFactory.getLogger(this::class.java)!!
     private val scheduler = Executors.newScheduledThreadPool(1)
@@ -22,7 +22,8 @@ class RedditIntegrationRunner(private val env: Env) {
     fun run(storage: Storage, redditFacade: RedditFacade, jda: JDA) {
         scheduler.scheduleAtFixedRate(Runnable {
             runBlocking {
-                execute(storage, redditFacade, jda)
+                cleanupPostHistories(storage)
+                postSubs(storage, redditFacade, jda)
             }
         }, interval, interval, TimeUnit.MILLISECONDS)
     }
@@ -31,59 +32,73 @@ class RedditIntegrationRunner(private val env: Env) {
         scheduler.shutdown()
     }
 
-    private suspend fun execute(storage: Storage, redditFacade: RedditFacade, jda: JDA) {
+    private suspend fun postSubs(storage: Storage, redditFacade: RedditFacade, jda: JDA) {
         val subs = storage.getSubs()
 
         if (subs.isEmpty()) {
             return
         }
 
-        log.info("Starting runner fetch for [${subs.size}] subs")
-        val listingThings = redditFacade.fetch(subs)
+        try {
+            log.info("Starting runner fetch for [${subs.size}] subs")
+            val listingThings = redditFacade.fetch(subs)
 
-        subs.forEach { sub ->
-            val channel = jda.getGuildById(sub.guildId)?.getGuildChannelById(sub.channelId)
-            if (channel == null) {
-                log.warn("Could not find channel for $sub")
-                return@forEach
+            subs.forEach { sub ->
+                val channel = jda.getGuildById(sub.guildId)?.getGuildChannelById(sub.channelId)
+                if (channel == null) {
+                    log.warn("Could not find channel for $sub")
+                    storage.removeSub(sub.guildId, sub.channelId, sub.sub)
+                    return@forEach
+                }
+
+                if (channel !is MessageChannel) {
+                    storage.removeSub(sub.guildId, sub.channelId, sub.sub)
+                    return@forEach
+                }
+
+                val listingThing = listingThings[sub.link] ?: return@forEach
+
+                val link = listingThing.data.children
+                    .map { it.data }
+                    .filter { !storage.isInPostHistory(sub.guildId, sub.channelId, sub.sub, it.id) }
+                    .randomOrNull()
+                    ?: return@forEach
+
+                val embed = EmbedBuilder()
+                    .setAuthor(link.author)
+                    .setTitle(link.title.take(200), "https://www.reddit.com${link.permalink}")
+                    .setFooter(sub.link)
+                    .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
+                    .setDescription(
+                        when (link.is_self) {
+                            true -> link.selftext.take(200)
+                            else -> link.url
+                        }
+                    )
+
+                link.preview?.images
+                    ?.firstOrNull()
+                    ?.resolutions
+                    ?.firstOrNull { it.width in 300..600 }
+                    ?.url
+                    ?.let { embed.setImage(it.replace("&amp;", "&")) }
+
+                storage.addPostHistory(sub.guildId, sub.channelId, sub.sub, link.id)
+
+                (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
             }
 
-            if (channel !is MessageChannel) {
-                return@forEach
-            }
-
-            val listingThing = listingThings[sub.link] ?: return@forEach
-
-            val link = listingThing.data.children
-                .map { it.data }
-                .filter { !storage.isInPostHistory(sub.guildId, sub.channelId, sub.sub, it.id) }
-                .randomOrNull()
-                ?: return@forEach
-
-            val embed = EmbedBuilder()
-                .setAuthor(link.author)
-                .setTitle(link.title.take(200), "https://www.reddit.com${link.permalink}")
-                .setFooter(sub.link)
-                .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
-                .setDescription(
-                    when (link.is_self) {
-                        true -> link.selftext.take(200)
-                        else -> link.url
-                    }
-                )
-
-            link.preview?.images
-                ?.firstOrNull()
-                ?.resolutions
-                ?.firstOrNull { it.width in 300..600 }
-                ?.url
-                ?.let { embed.setImage(it.replace("&amp;", "&")) }
-
-            storage.addPostHistory(sub.guildId, sub.channelId, sub.sub, link.id)
-
-            (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
+            log.info("Runner finished, next run in [$interval]ms")
+        } catch (exc: Exception) {
+            log.error(exc.message, exc)
         }
+    }
 
-        log.info("Runner finished, next run in [$interval]ms")
+    private suspend fun cleanupPostHistories(storage: Storage) {
+        try {
+            storage.cleanupPostHistory()
+        } catch (exc: Exception) {
+            log.error(exc.message, exc)
+        }
     }
 }

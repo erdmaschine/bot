@@ -3,8 +3,7 @@ package erdmaschine.bot
 import erdmaschine.bot.listener.CommandListener
 import erdmaschine.bot.listener.MessageListener
 import erdmaschine.bot.listener.ReactionListener
-import erdmaschine.bot.model.DbStorage
-import erdmaschine.bot.model.MemoryStorage
+import erdmaschine.bot.model.Storage
 import erdmaschine.bot.reddit.RedditFacade
 import erdmaschine.bot.reddit.RedditIntegrationRunner
 import kotlinx.coroutines.runBlocking
@@ -22,14 +21,9 @@ fun main() = runBlocking {
     try {
         log.info("Starting up erdmaschine-bot")
 
-        val storage = if (env.dbUrl.isNotBlank()) {
-            DbStorage(env)
-        } else {
-            log.info("No jdbc url found, using memory storage")
-            MemoryStorage()
-        }
-
-        val commandListener = CommandListener(storage)
+        val storage = Storage(env)
+        val redditFacade = RedditFacade(env)
+        val commandListener = CommandListener(storage, redditFacade)
 
         val jda = JDABuilder.createDefault(env.authToken)
             .addEventListeners(
@@ -41,7 +35,7 @@ fun main() = runBlocking {
 
         jda.awaitReady()
 
-        redditIntegrationRunner.run(storage, RedditFacade(env), jda)
+        redditIntegrationRunner.run(storage, redditFacade, jda)
 
         commandListener.initCommands(jda, env)
 

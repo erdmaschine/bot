@@ -2,6 +2,7 @@ package erdmaschine.bot.commands
 
 import erdmaschine.bot.await
 import erdmaschine.bot.model.Storage
+import erdmaschine.bot.reddit.RedditFacade
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -53,7 +54,11 @@ val ConfigureRedditCommand = Commands.slash("config-reddit", "Configure reddit i
             .addOptions(channelOption, subOption),
     )
 
-suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandInteractionEvent) {
+suspend fun executeConfigureRedditCommand(
+    storage: Storage,
+    redditFacade: RedditFacade,
+    event: SlashCommandInteractionEvent
+) {
     val channel = event.getOption(OPTION_CHANNEL)?.asMessageChannel ?: throw Exception("Invalid channel type")
     if (!PermissionUtil.checkPermission(channel.permissionContainer, event.member, Permission.MESSAGE_MANAGE)) {
         throw Exception("You are not authorized to configure reddit integration for that channel")
@@ -66,7 +71,13 @@ suspend fun executeConfigureRedditCommand(storage: Storage, event: SlashCommandI
 
     when (event.subcommandName) {
         COMMAND_ADD_SUB -> {
-            storage.addSub(channel.guild.id, channel.id, sub, listing, nsfw)
+            storage.addSub(channel.guild.id, channel.id, sub, listing, nsfw)?.let { subModel ->
+                // Prefill the history so there's no initial dump of posts directly after adding
+                redditFacade.fetch(listOf(subModel))[subModel.link]?.data?.children?.map { it.data }?.forEach { link ->
+                    storage.addPostHistory(subModel.guildId, subModel.channelId, subModel.sub, link.id)
+                }
+            }
+
             message = "Done"
         }
 
