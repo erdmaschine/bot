@@ -1,0 +1,22 @@
+name: Deploy
+
+on: workflow_dispatch
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: target
+          path: target
+
+      - name: Setup fly.io
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy
+        run: flyctl deploy --remote-only
