@@ -25,7 +25,9 @@ jobs:
       - uses: actions/upload-artifact@master
         with:
           name: target
-          path: target
+          path: |
+            fly.toml
+            target/
 
   deploy:
     runs-on: ubuntu-latest
@@ -36,7 +38,6 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: target
-          path: target
 
       - name: Setup fly.io
         uses: superfly/flyctl-actions/setup-flyctl@master
