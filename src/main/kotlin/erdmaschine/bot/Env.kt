@@ -23,9 +23,6 @@ class Env {
     val redditRunnerInterval: String
         get() = get("REDDIT_RUNNER_INTERVAL")
 
-    val redditRunnerHistorySize: String
-        get() = get("REDDIT_RUNNER_HISTORY_SIZE")
-
     val redditPostHistoryThreshold: String
         get() = get("REDDIT_POSTHISTORY_THRESHOLD")
 
