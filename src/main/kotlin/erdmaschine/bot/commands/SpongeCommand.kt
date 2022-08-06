@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 
-private const val OPTION_TEXT = "link"
+private const val OPTION_TEXT = "text"
 
 val SpongeCommand = Commands.slash("sponge", "sPoNgEbObIfY a TeXt")
     .addOption(OptionType.STRING, OPTION_TEXT, "Text to be used", true)

@@ -37,16 +37,6 @@ class CommandListener(
         if (env.deployCommandsGobal == "true") {
             log.info("Initializing commands globally")
             jda.updateCommands().addCommands(slashCommandData).await()
-
-            jda.guilds.forEach { guild ->
-                slashCommandData.forEach { command ->
-                    log.info("Removing command [$command] from [$guild]")
-                    try {
-                        guild.deleteCommandById(command.name)
-                    } catch (_: Exception) {
-                    }
-                }
-            }
         } else {
             jda.guilds.forEach {
                 log.info("Initializing commands on [$it]")

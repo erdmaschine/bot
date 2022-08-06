@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 import java.util.*
 import kotlin.random.Random
 
-private const val OPTION_TEXT = "link"
+private const val OPTION_TEXT = "text"
 private const val stutterChance = 20
 private const val emojiChance = 50
 

@@ -79,7 +79,7 @@ class RedditIntegrationRunner(env: Env) {
                 link.preview?.images
                     ?.firstOrNull()
                     ?.resolutions
-                    ?.firstOrNull { it.width in 300..600 }
+                    ?.maxBy { it.width }
                     ?.url
                     ?.let { embed.setImage(it.replace("&amp;", "&")) }
 
