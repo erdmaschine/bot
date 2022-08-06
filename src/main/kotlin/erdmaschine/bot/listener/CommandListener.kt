@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory
 import kotlin.time.ExperimentalTime
 
 private val slashCommandData = listOf(
-    HelpCommand,
     ListCommand,
     FavCommand,
     QuoteCommand,
@@ -22,6 +21,8 @@ private val slashCommandData = listOf(
     GuildStatsCommand,
     MysteryFavCommand,
     ConfigureRedditCommand,
+    SpongeCommand,
+    UwuCommand,
 )
 
 @ExperimentalTime
@@ -36,6 +37,16 @@ class CommandListener(
         if (env.deployCommandsGobal == "true") {
             log.info("Initializing commands globally")
             jda.updateCommands().addCommands(slashCommandData).await()
+
+            jda.guilds.forEach { guild ->
+                slashCommandData.forEach { command ->
+                    log.info("Removing command [$command] from [$guild]")
+                    try {
+                        guild.deleteCommandById(command.name)
+                    } catch (_: Exception) {
+                    }
+                }
+            }
         } else {
             jda.guilds.forEach {
                 log.info("Initializing commands on [$it]")
@@ -47,7 +58,6 @@ class CommandListener(
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) = runBlocking {
         try {
             when (event.name) {
-                HelpCommand.name -> executeHelpCommand(event)
                 ListCommand.name -> executeListCommand(storage, event)
                 FavCommand.name -> executeFavCommand(storage, event)
                 QuoteCommand.name -> executeQuoteCommand(event)
@@ -55,12 +65,14 @@ class CommandListener(
                 GuildStatsCommand.name -> executeGuildStats(storage, event)
                 MysteryFavCommand.name -> executeMysteryFavCommand(storage, event)
                 ConfigureRedditCommand.name -> executeConfigureRedditCommand(storage, redditFacade, event)
+                SpongeCommand.name -> executeSpongeCommand(event)
+                UwuCommand.name -> executeUwuCommand(event)
                 else -> Unit
             }
         } catch (e: Exception) {
             val interaction = when (event.isAcknowledged) {
                 true -> event.hook
-                else -> event.reply("Whoopsie (╯°□°）╯︵ ┻━┻").await()
+                else -> event.reply("Whoopsie (╯°□°）╯︵ ┻━┻").setEphemeral(true).await()
             }
             interaction.replyError(e.message ?: "Unknown error")
             log.error(e.message, e)

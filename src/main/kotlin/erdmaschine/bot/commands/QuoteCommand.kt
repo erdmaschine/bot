@@ -8,18 +8,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 
-private const val LINK = "link"
+private const val OPTION_LINK = "link"
 
 val QuoteCommand = Commands.slash("quote", "quote message")
-    .addOption(
-        OptionType.STRING,
-        LINK, "Link to message", true
-    )
+    .addOption(OptionType.STRING, OPTION_LINK, "Link to message", true)
 
 suspend fun executeQuoteCommand(event: SlashCommandInteractionEvent) {
     val interaction = event.reply("Fetching message...").await()
 
-    val messageLink = event.getOption(LINK)?.asString.orEmpty()
+    val messageLink = event.getOption(OPTION_LINK)?.asString.orEmpty()
     val tokenizedLink = messageLink.substringAfter("/channels/", "").split("/")
     if (tokenizedLink.size != 3) {
         return interaction.replyError("Invalid link format!")
