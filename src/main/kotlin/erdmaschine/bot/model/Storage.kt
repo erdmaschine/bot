@@ -42,6 +42,8 @@ class Storage(env: Env) {
                 it[Favs.channelId] = channelId
                 it[Favs.messageId] = messageId
                 it[Favs.authorId] = authorId
+                it[used] = 0
+                it[votes] = 0
                 it[tags] = ""
             } get Favs.id
         }
