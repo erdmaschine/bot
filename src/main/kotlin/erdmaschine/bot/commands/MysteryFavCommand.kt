@@ -11,10 +11,22 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 
 private const val SELF = "self"
+private const val OPTION_UWU = "uwu"
+private const val OPTION_SPONGE = "sponge"
 
 val MysteryFavCommand =
     Commands.slash("mystery", "Post a random fav (even of other users), without revealing the author")
         .addOption(OptionType.BOOLEAN, SELF, "Only choose mystery fav from your own favs")
+        .addOption(
+            OptionType.BOOLEAN,
+            OPTION_UWU,
+            "Uwuwify the fav"
+        )
+        .addOption(
+            OptionType.BOOLEAN,
+            OPTION_SPONGE,
+            "Spongeifiy the fav"
+        )
 
 suspend fun executeMysteryFavCommand(storage: Storage, event: SlashCommandInteractionEvent) {
     val guildIds = event.jda.guilds.map { it.id }
@@ -41,7 +53,10 @@ suspend fun executeMysteryFavCommand(storage: Storage, event: SlashCommandIntera
         ?: return interaction.replyError("Channel not found:\n${fav.channelUrl()}", fav.id)
 
     val message = retrieveMessageWithErrorHandling(fav, storage, interaction, channel) ?: return
-    val embed = EmbedBuilder().forMessage(message, fav.id)
+
+    val sponge = event.getOption(OPTION_SPONGE)?.asBoolean == true
+    val uwu = event.getOption(OPTION_UWU)?.asBoolean == true
+    val embed = EmbedBuilder().forMessage(message, fav.id, sponge, uwu)
         .setAuthor("Mystery Fav", message.jumpUrl)
         .build()
 
