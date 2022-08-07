@@ -51,13 +51,13 @@ fun EmbedBuilder.forMessage(
     setAuthor("${message.author.name} in #$channelName", message.jumpUrl, message.author.effectiveAvatarUrl)
     setColor(Color(80, 150, 25))
 
-    val text = message.contentRaw
+    var text = message.contentRaw
 
     if (sponge == true) {
-        text.spongeify()
+        text = text.spongeify()
     }
     if (uwu == true) {
-        text.uwuify()
+        text = text.uwuify()
     }
 
     setDescription(text)

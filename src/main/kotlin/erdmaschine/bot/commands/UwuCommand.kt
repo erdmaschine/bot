@@ -21,10 +21,10 @@ val UwuCommand = Commands.slash("uwu", "uwuwify a twext swipt uwu^^")
     )
 
 suspend fun executeUwuCommand(event: SlashCommandInteractionEvent) {
-    val text = event.getOption(OPTION_TEXT)?.asString ?: throw Exception("Text must be provided")
+    var text = event.getOption(OPTION_TEXT)?.asString ?: throw Exception("Text must be provided")
 
     if (event.getOption(OPTION_SPONGE)?.asBoolean == true) {
-        text.spongeify()
+        text = text.spongeify()
     }
 
     event.reply(text.uwuify()).await()

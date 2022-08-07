@@ -17,10 +17,10 @@ val SpongeCommand = Commands.slash("sponge", "sPoNgEbObIfY a TeXt")
     )
 
 suspend fun executeSpongeCommand(event: SlashCommandInteractionEvent) {
-    val text = event.getOption(OPTION_TEXT)?.asString?.spongeify() ?: throw Exception("Text must be provided")
+    var text = event.getOption(OPTION_TEXT)?.asString?.spongeify() ?: throw Exception("Text must be provided")
 
     if (event.getOption(OPTION_UWU)?.asBoolean == true) {
-        text.uwuify()
+        text = text.uwuify()
     }
 
     event.reply(text).await()
