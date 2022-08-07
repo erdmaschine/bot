@@ -9,9 +9,21 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 
 private const val OPTION_LINK = "link"
+private const val OPTION_UWU = "uwu"
+private const val OPTION_SPONGE = "sponge"
 
 val QuoteCommand = Commands.slash("quote", "quote message")
     .addOption(OptionType.STRING, OPTION_LINK, "Link to message", true)
+    .addOption(
+        OptionType.BOOLEAN,
+        OPTION_UWU,
+        "Uwuwify the fav"
+    )
+    .addOption(
+        OptionType.BOOLEAN,
+        OPTION_SPONGE,
+        "Spongeifiy the fav"
+    )
 
 suspend fun executeQuoteCommand(event: SlashCommandInteractionEvent) {
     val interaction = event.reply("Fetching message...").await()
@@ -31,7 +43,11 @@ suspend fun executeQuoteCommand(event: SlashCommandInteractionEvent) {
     val message = channel?.retrieveMessageById(messageId)?.await()
         ?: return interaction.replyError("No message found at that link!")
 
-    val embed = EmbedBuilder().forMessage(message).build()
+    val sponge = event.getOption(OPTION_SPONGE)?.asBoolean == true
+    val uwu = event.getOption(OPTION_UWU)?.asBoolean == true
+
+    val embed = EmbedBuilder().forMessage(message, null, sponge, uwu).build()
+
     interaction.editOriginal(getQuoteMessage()).await()
     interaction.editOriginalEmbeds(embed).await()
 }

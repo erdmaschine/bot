@@ -1,5 +1,7 @@
 package erdmaschine.bot
 
+import erdmaschine.bot.commands.spongeify
+import erdmaschine.bot.commands.uwuify
 import erdmaschine.bot.model.Fav
 import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
@@ -39,11 +41,26 @@ fun Collection<Fav>.weightedRandom(): Fav? {
     }
 }
 
-fun EmbedBuilder.forMessage(message: Message, favId: String? = ""): EmbedBuilder = with(this) {
+fun EmbedBuilder.forMessage(
+    message: Message,
+    favId: String? = "",
+    sponge: Boolean? = false,
+    uwu: Boolean? = false
+): EmbedBuilder = with(this) {
     val channelName = message.channel.name
     setAuthor("${message.author.name} in #$channelName", message.jumpUrl, message.author.effectiveAvatarUrl)
     setColor(Color(80, 150, 25))
-    setDescription(message.contentRaw)
+
+    val text = message.contentRaw
+
+    if (sponge == true) {
+        text.spongeify()
+    }
+    if (uwu == true) {
+        text.uwuify()
+    }
+
+    setDescription(text)
     setTimestamp(message.timeCreated)
 
     val embedImageUrl = message.attachments

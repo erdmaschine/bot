@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 
 private const val OPTION_TAG = "tag"
 private const val OPTION_ID = "id"
+private const val OPTION_UWU = "uwu"
+private const val OPTION_SPONGE = "sponge"
 
 val FavCommand =
     Commands.slash("fav", "Post a random fav, filtered by the given tags or from all favs")
@@ -25,6 +27,16 @@ val FavCommand =
             OptionType.STRING,
             OPTION_ID,
             "Post the fav associated with this specific ID"
+        )
+        .addOption(
+            OptionType.BOOLEAN,
+            OPTION_UWU,
+            "Uwuwify the fav"
+        )
+        .addOption(
+            OptionType.BOOLEAN,
+            OPTION_SPONGE,
+            "Spongeifiy the fav"
         )
 
 suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEvent) {
@@ -59,7 +71,10 @@ suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEv
         ?: return interaction.replyError("Channel not found:\n${fav.channelUrl()}", fav.id)
 
     val message = retrieveMessageWithErrorHandling(fav, storage, interaction, channel) ?: return
-    val embed = EmbedBuilder().forMessage(message, fav.id).build()
+
+    val sponge = event.getOption(OPTION_SPONGE)?.asBoolean == true
+    val uwu = event.getOption(OPTION_UWU)?.asBoolean == true
+    val embed = EmbedBuilder().forMessage(message, fav.id, sponge, uwu).build()
 
     interaction.editOriginal(getFavMessage()).await()
     interaction.editOriginalEmbeds(embed).await()

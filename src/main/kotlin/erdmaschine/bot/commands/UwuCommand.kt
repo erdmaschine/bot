@@ -8,19 +8,30 @@ import java.util.*
 import kotlin.random.Random
 
 private const val OPTION_TEXT = "text"
+private const val OPTION_SPONGE = "sponge"
 private const val stutterChance = 20
 private const val emojiChance = 50
 
 val UwuCommand = Commands.slash("uwu", "uwuwify a twext swipt uwu^^")
     .addOption(OptionType.STRING, OPTION_TEXT, "Text to be used", true)
+    .addOption(
+        OptionType.BOOLEAN,
+        OPTION_SPONGE,
+        "Spongeifiy as well"
+    )
 
 suspend fun executeUwuCommand(event: SlashCommandInteractionEvent) {
     val text = event.getOption(OPTION_TEXT)?.asString ?: throw Exception("Text must be provided")
-    event.reply(uwuify(text)).await()
+
+    if (event.getOption(OPTION_SPONGE)?.asBoolean == true) {
+        text.spongeify()
+    }
+
+    event.reply(text.uwuify()).await()
 }
 
-private fun uwuify(input: String): String {
-    var output = input
+fun String.uwuify(): String {
+    var output = this
 
     // replace some words
     var find = output.findAnyOf(words.keys, ignoreCase = true)
