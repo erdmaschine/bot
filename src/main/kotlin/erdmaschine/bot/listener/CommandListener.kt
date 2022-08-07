@@ -35,6 +35,16 @@ class CommandListener(
 
     suspend fun initCommands(jda: JDA, env: Env) {
         if (env.deployCommandsGobal == "true") {
+            log.info("Removing guild commands")
+            jda.guilds.forEach { guild ->
+                guild.retrieveCommands().await().forEach { command ->
+                    try {
+                        guild.deleteCommandById(command.id)
+                    } catch (_: Exception) {
+                    }
+                }
+            }
+
             log.info("Initializing commands globally")
             jda.updateCommands().addCommands(slashCommandData).await()
         } else {
