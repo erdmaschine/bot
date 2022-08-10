@@ -10,6 +10,9 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import org.slf4j.LoggerFactory
+
+private val LOG = LoggerFactory.getLogger("erdmaschine.bot.commands.FavCommand")!!
 
 private const val OPTION_TAG = "tag"
 private const val OPTION_ID = "id"
@@ -79,7 +82,11 @@ suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEv
     interaction.editOriginal(getFavMessage()).await()
     interaction.editOriginalEmbeds(embed).await()
 
-    val original = interaction.retrieveOriginal().await()
-    original.addReaction("👍").await()
-    original.addReaction("👎").await()
+    try {
+        val original = interaction.retrieveOriginal().await()
+        original.addReaction("👍").await()
+        original.addReaction("👎").await()
+    } catch (exc: Exception) {
+        LOG.warn(exc.message, exc)
+    }
 }
