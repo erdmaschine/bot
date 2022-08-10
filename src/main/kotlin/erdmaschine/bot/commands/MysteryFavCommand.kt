@@ -9,10 +9,13 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import org.slf4j.LoggerFactory
 
 private const val SELF = "self"
 private const val OPTION_UWU = "uwu"
 private const val OPTION_SPONGE = "sponge"
+
+private val LOG = LoggerFactory.getLogger("erdmaschine.bot.commands.MysteryFavCommand")!!
 
 val MysteryFavCommand =
     Commands.slash("mystery", "Post a random fav (even of other users), without revealing the author")
@@ -63,7 +66,11 @@ suspend fun executeMysteryFavCommand(storage: Storage, event: SlashCommandIntera
     interaction.editOriginal(getFavMessage()).await()
     interaction.editOriginalEmbeds(embed).await()
 
-    val original = interaction.retrieveOriginal().await()
-    original.addReaction("👍").await()
-    original.addReaction("👎").await()
+    try {
+        val original = interaction.retrieveOriginal().await()
+        original.addReaction("👍").await()
+        original.addReaction("👎").await()
+    } catch (exc: Exception) {
+        LOG.warn(exc.message, exc)
+    }
 }
