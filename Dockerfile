@@ -4,4 +4,4 @@ WORKDIR /app
 
 COPY target .
 
-CMD ["java", "-cp",  "classes:dependency/*", "erdmaschine.bot.MainKt"]
+CMD ["java", "-Xmx128m", "-cp",  "classes:dependency/*", "erdmaschine.bot.MainKt"]
