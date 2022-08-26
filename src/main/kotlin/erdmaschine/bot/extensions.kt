@@ -3,21 +3,17 @@ package erdmaschine.bot
 import erdmaschine.bot.commands.spongeify
 import erdmaschine.bot.commands.uwuify
 import erdmaschine.bot.model.Fav
-import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.interactions.InteractionHook
-import net.dv8tion.jda.api.requests.RestAction
 import org.apache.commons.rng.sampling.DiscreteProbabilityCollectionSampler
 import org.apache.commons.rng.simple.RandomSource
 import java.awt.Color
 
 val RNG = RandomSource.JDK.create()!!
 
-suspend fun <T> RestAction<T>.await(): T = this.submit().await()
-
-suspend fun InteractionHook.replyError(message: String, favId: String? = null) {
-    this.editOriginal("Whoopsie (╯°□°）╯︵ ┻━┻").await()
+fun InteractionHook.replyError(message: String, favId: String? = null) {
+    this.editOriginal("Whoopsie (╯°□°）╯︵ ┻━┻").submit()
     this.editOriginalEmbeds(
         EmbedBuilder()
             .setDescription(message)
@@ -25,7 +21,7 @@ suspend fun InteractionHook.replyError(message: String, favId: String? = null) {
             .setColor(Color(150, 25, 25))
             .build()
     )
-        .await()
+        .submit()
 }
 
 fun Collection<Fav>.weightedRandom(): Fav? {
@@ -49,7 +45,6 @@ fun EmbedBuilder.forMessage(
 ): EmbedBuilder = with(this) {
     val channelName = message.channel.name
     setAuthor("${message.author.name} in #$channelName", message.jumpUrl, message.author.effectiveAvatarUrl)
-    setColor(Color(80, 150, 25))
 
     var text = message.contentRaw
 
@@ -60,6 +55,7 @@ fun EmbedBuilder.forMessage(
         text = text.uwuify()
     }
 
+    setColor(Color(45, 80, 50))
     setDescription(text)
     setTimestamp(message.timeCreated)
 

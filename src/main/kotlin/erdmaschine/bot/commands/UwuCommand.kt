@@ -1,6 +1,5 @@
 package erdmaschine.bot.commands
 
-import erdmaschine.bot.await
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -20,14 +19,14 @@ val UwuCommand = Commands.slash("uwu", "uwuwify a twext swipt uwu^^")
         "Spongeifiy as well"
     )
 
-suspend fun executeUwuCommand(event: SlashCommandInteractionEvent) {
+fun executeUwuCommand(event: SlashCommandInteractionEvent) {
     var text = event.getOption(OPTION_TEXT)?.asString ?: throw Exception("Text must be provided")
 
     if (event.getOption(OPTION_SPONGE)?.asBoolean == true) {
         text = text.spongeify()
     }
 
-    event.reply(text.uwuify()).await()
+    event.reply(text.uwuify()).submit()
 }
 
 fun String.uwuify(): String {
@@ -84,7 +83,7 @@ fun String.uwuify(): String {
     }
 
     // add a text emoji at the end sometimes
-    if (!punctuation.contains(output.last()) && randomWithChance(emojiChance)) {
+    if (!punctuation.contains(output.lastOrNull()) && randomWithChance(emojiChance)) {
         output += emojis[Random.nextInt(0, emojis.size - 1)]
     }
 

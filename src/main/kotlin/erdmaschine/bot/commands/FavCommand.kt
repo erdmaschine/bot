@@ -1,11 +1,11 @@
 package erdmaschine.bot.commands
 
-import erdmaschine.bot.await
 import erdmaschine.bot.forMessage
 import erdmaschine.bot.model.Fav
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.replyError
 import erdmaschine.bot.weightedRandom
+import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -47,12 +47,12 @@ suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEv
     val tags = event.getOption(OPTION_TAG)?.asString?.split(" ").orEmpty()
     val guildIds = event.jda.guilds.map { it.id }
 
-    val interaction = event.reply("Fetching candidates...").await()
+    event.deferReply().submit()
 
     val candidates = mutableListOf<Fav>()
     if (id.isNotBlank()) {
         val fav = storage.getFav(id)
-            ?: return interaction.replyError("Fav with id [$id] not found")
+            ?: return event.hook.replyError("Fav with id [$id] not found")
         candidates.add(fav)
     } else {
         storage
@@ -62,30 +62,29 @@ suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEv
     }
 
     val fav = candidates.weightedRandom()
-        ?: return interaction.replyError("No favs found")
+        ?: return event.hook.replyError("No favs found")
 
     storage.increaseUsed(fav)
 
     val guild = event.jda.guilds
         .firstOrNull { it.id == fav.guildId }
-        ?: return interaction.replyError("Guild not found:\n${fav.guildUrl()}", fav.id)
+        ?: return event.hook.replyError("Guild not found:\n${fav.guildUrl()}", fav.id)
     val channel = guild.getTextChannelById(fav.channelId)
         ?: guild.getThreadChannelById(fav.channelId)
-        ?: return interaction.replyError("Channel not found:\n${fav.channelUrl()}", fav.id)
+        ?: return event.hook.replyError("Channel not found:\n${fav.channelUrl()}", fav.id)
 
-    val message = retrieveMessageWithErrorHandling(fav, storage, interaction, channel) ?: return
+    val message = retrieveMessageWithErrorHandling(fav, storage, event.hook, channel) ?: return
 
     val sponge = event.getOption(OPTION_SPONGE)?.asBoolean == true
     val uwu = event.getOption(OPTION_UWU)?.asBoolean == true
     val embed = EmbedBuilder().forMessage(message, fav.id, sponge, uwu).build()
 
-    interaction.editOriginal(getFavMessage()).await()
-    interaction.editOriginalEmbeds(embed).await()
+    event.hook.editOriginalEmbeds(embed).submit()
 
     try {
-        val original = interaction.retrieveOriginal().await()
-        original.addReaction("👍").await()
-        original.addReaction("👎").await()
+        val original = event.hook.retrieveOriginal().submit().await()
+        original.addReaction("👍").submit()
+        original.addReaction("👎").submit()
     } catch (exc: Exception) {
         LOG.warn(exc.message, exc)
     }

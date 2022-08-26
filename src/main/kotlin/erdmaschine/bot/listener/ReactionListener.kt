@@ -1,8 +1,8 @@
 package erdmaschine.bot.listener
 
-import erdmaschine.bot.await
 import erdmaschine.bot.forMessage
 import erdmaschine.bot.model.Storage
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent
@@ -52,7 +52,7 @@ class ReactionListener(
             return
         }
 
-        val message = event.retrieveMessage().await()
+        val message = event.retrieveMessage().submit().await()
         val author = message.author
 
         if (author.isBot) {
@@ -68,11 +68,11 @@ class ReactionListener(
         event.retrieveUser()
             .flatMap { user -> user.openPrivateChannel() }
             .flatMap { channel -> channel.sendMessageEmbeds(embed.build()) }
-            .await()
+            .submit()
     }
 
     private suspend fun removeFav(event: MessageReactionAddEvent) {
-        val message = event.retrieveMessage().await()
+        val message = event.retrieveMessage().submit().await()
         val favId = message.embeds.firstOrNull()?.footer?.text.orEmpty()
         val fav = storage.getFav(favId) ?: return
         if (fav.userId == event.userId) {
@@ -81,7 +81,7 @@ class ReactionListener(
     }
 
     private suspend fun editFav(event: MessageReactionAddEvent) {
-        val message = event.retrieveMessage().await()
+        val message = event.retrieveMessage().submit().await()
         val favId = message.embeds.firstOrNull()?.footer?.text.orEmpty()
         val fav = storage.getFav(favId) ?: return
         if (fav.userId != event.userId) {
@@ -101,14 +101,14 @@ class ReactionListener(
         event.retrieveUser()
             .flatMap { user -> user.openPrivateChannel() }
             .flatMap { channel -> channel.sendMessageEmbeds(embed.build()) }
-            .await()
+            .submit()
     }
 
     private suspend fun upvote(event: GenericMessageReactionEvent) {
         if (event.user?.isBot != false) {
             return
         }
-        val message = event.retrieveMessage().await()
+        val message = event.retrieveMessage().submit().await()
         val favId = message.embeds.firstOrNull()?.footer?.text.orEmpty()
         val fav = storage.getFav(favId) ?: return
         if (fav.userId != event.userId) {
@@ -120,7 +120,7 @@ class ReactionListener(
         if (event.user?.isBot != false) {
             return
         }
-        val message = event.retrieveMessage().await()
+        val message = event.retrieveMessage().submit().await()
         val favId = message.embeds.firstOrNull()?.footer?.text.orEmpty()
         val fav = storage.getFav(favId) ?: return
         if (fav.userId != event.userId) {

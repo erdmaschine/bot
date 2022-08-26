@@ -1,8 +1,8 @@
 package erdmaschine.bot.commands
 
-import erdmaschine.bot.await
 import erdmaschine.bot.forMessage
 import erdmaschine.bot.replyError
+import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -26,12 +26,12 @@ val QuoteCommand = Commands.slash("quote", "quote message")
     )
 
 suspend fun executeQuoteCommand(event: SlashCommandInteractionEvent) {
-    val interaction = event.reply("Fetching message...").await()
+    event.deferReply()
 
     val messageLink = event.getOption(OPTION_LINK)?.asString.orEmpty()
     val tokenizedLink = messageLink.substringAfter("/channels/", "").split("/")
     if (tokenizedLink.size != 3) {
-        return interaction.replyError("Invalid link format!")
+        return event.hook.replyError("Invalid link format!")
     }
 
     val guildId = tokenizedLink[0]
@@ -40,14 +40,13 @@ suspend fun executeQuoteCommand(event: SlashCommandInteractionEvent) {
 
     val guild = event.jda.guilds.firstOrNull { it.id == guildId }
     val channel = guild?.getTextChannelById(channelId) ?: guild?.getThreadChannelById(channelId)
-    val message = channel?.retrieveMessageById(messageId)?.await()
-        ?: return interaction.replyError("No message found at that link!")
+    val message = channel?.retrieveMessageById(messageId)?.submit()?.await()
+        ?: return event.hook.replyError("No message found at that link!")
 
     val sponge = event.getOption(OPTION_SPONGE)?.asBoolean == true
     val uwu = event.getOption(OPTION_UWU)?.asBoolean == true
 
     val embed = EmbedBuilder().forMessage(message, null, sponge, uwu).build()
 
-    interaction.editOriginal(getQuoteMessage()).await()
-    interaction.editOriginalEmbeds(embed).await()
+    event.hook.editOriginalEmbeds(embed).submit()
 }

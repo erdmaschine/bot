@@ -1,6 +1,5 @@
 package erdmaschine.bot.commands
 
-import erdmaschine.bot.await
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.replyError
 import net.dv8tion.jda.api.EmbedBuilder
@@ -9,6 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import java.awt.Color
 
 private const val OPTION_TAG = "tag"
 private const val OPTION_GUILD = "server"
@@ -26,14 +26,14 @@ val ListCommand = Commands.slash("list", "List amount of favs per tag")
     )
 
 suspend fun executeListCommand(storage: Storage, event: SlashCommandInteractionEvent) {
-    val interaction = event.reply("Fetching favs...").await()
+    event.deferReply().submit()
 
     val tags = event.getOption(OPTION_TAG)?.asString.orEmpty().split(" ").filter { it.isNotBlank() }
     val guildId = event.getOption(OPTION_GUILD)?.asString ?: event.guild?.id
     val favs = storage.getFavs(event.user.id, guildId, tags)
 
     if (favs.isEmpty()) {
-        return interaction.replyError("No favs found")
+        return event.hook.replyError("No favs found")
     }
 
     val tagCount = mutableMapOf<String, Int>()
@@ -45,7 +45,7 @@ suspend fun executeListCommand(storage: Storage, event: SlashCommandInteractionE
             }
         }
 
-    interaction.editOriginal("Listing total of ${tagCount.size} tags").await()
+    event.hook.editOriginal("Listing total of ${tagCount.size} tags").submit()
 
     tagCount
         .entries
@@ -55,13 +55,13 @@ suspend fun executeListCommand(storage: Storage, event: SlashCommandInteractionE
         .forEach { messageEntries ->
             val embeds = mutableListOf<MessageEmbed>()
             messageEntries.forEach { fields ->
-                val builder = EmbedBuilder()
+                val builder = EmbedBuilder().setColor(Color(20, 150, 115))
                 fields.forEach { builder.addField(it.key, it.value.toString(), true) }
                 embeds.add(builder.build())
             }
             event
                 .channel
                 .sendMessage(MessageBuilder().setEmbeds(embeds).build())
-                .await()
+                .submit()
         }
 }

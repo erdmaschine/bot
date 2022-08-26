@@ -1,7 +1,6 @@
 package erdmaschine.bot.reddit
 
 import erdmaschine.bot.Env
-import erdmaschine.bot.await
 import erdmaschine.bot.model.Storage
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.runBlocking
@@ -9,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.MessageChannel
 import org.slf4j.LoggerFactory
+import java.awt.Color
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -67,6 +67,7 @@ class RedditIntegrationRunner(env: Env) {
                 val embed = EmbedBuilder()
                     .setAuthor(link.author)
                     .setTitle(link.title.take(200), "https://www.reddit.com${link.permalink}")
+                    .setColor(Color(240, 100, 60))
                     .setFooter(sub.link)
                     .setTimestamp(Date((link.created * 1000).toLong()).toInstant())
                     .setDescription(
@@ -85,7 +86,7 @@ class RedditIntegrationRunner(env: Env) {
 
                 storage.addPostHistory(sub.guildId, sub.channelId, sub.sub, link.id)
 
-                (channel as MessageChannel).sendMessageEmbeds(embed.build()).await()
+                (channel as MessageChannel).sendMessageEmbeds(embed.build()).submit()
             }
 
             log.info("Runner finished, next run in [$interval]ms")

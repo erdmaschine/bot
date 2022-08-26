@@ -1,6 +1,5 @@
 package erdmaschine.bot.commands
 
-import erdmaschine.bot.await
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -16,14 +15,14 @@ val SpongeCommand = Commands.slash("sponge", "sPoNgEbObIfY a TeXt")
         "Uwuwify as well"
     )
 
-suspend fun executeSpongeCommand(event: SlashCommandInteractionEvent) {
+fun executeSpongeCommand(event: SlashCommandInteractionEvent) {
     var text = event.getOption(OPTION_TEXT)?.asString?.spongeify() ?: throw Exception("Text must be provided")
 
     if (event.getOption(OPTION_UWU)?.asBoolean == true) {
         text = text.uwuify()
     }
 
-    event.reply(text).await()
+    event.reply(text).submit()
 }
 
 fun String.spongeify() = this.lowercase().mapIndexed { idx, char ->

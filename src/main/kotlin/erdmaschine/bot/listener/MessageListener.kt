@@ -1,7 +1,7 @@
 package erdmaschine.bot.listener
 
-import erdmaschine.bot.await
 import erdmaschine.bot.model.Storage
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -15,7 +15,7 @@ class MessageListener(
         val message = event.message
 
         if (message.contentRaw.startsWith("\$fav") && !message.author.isBot) {
-            message.reply("It's /fav now. Get with the times, oldie ( ﾉ ﾟｰﾟ)ﾉ").await()
+            message.reply("It's /fav now. Get with the times, oldie ( ﾉ ﾟｰﾟ)ﾉ").submit()
             return@runBlocking
         }
 
@@ -32,7 +32,7 @@ class MessageListener(
             return@runBlocking
         }
 
-        val history = message.channel.getHistoryBefore(message.id, 1).await()
+        val history = message.channel.getHistoryBefore(message.id, 1).submit().await()
         val previousMessage = history.retrievedHistory.firstOrNull() ?: return@runBlocking
 
         if (!previousMessage.author.isBot) {
@@ -54,7 +54,7 @@ class MessageListener(
         }
 
         storage.writeTags(favId, tags)
-        message.addReaction("✅").await()
+        message.addReaction("✅").submit()
     }
 
 }

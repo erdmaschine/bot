@@ -1,11 +1,11 @@
 package erdmaschine.bot.commands
 
-import erdmaschine.bot.await
 import erdmaschine.bot.model.Fav
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.replyError
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
@@ -13,7 +13,8 @@ import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.interactions.InteractionHook
 
-suspend fun JDA.getUser(userId: String): User = this.getUserById(userId) ?: this.retrieveUserById(userId).await()
+suspend fun JDA.getUser(userId: String): User =
+    this.getUserById(userId) ?: this.retrieveUserById(userId).submit().await()
 
 suspend fun getTopAuthors(favs: Collection<Fav>, jda: JDA): Collection<String> =
     favs.groupBy { it.authorId }
@@ -69,7 +70,7 @@ suspend fun retrieveMessageWithErrorHandling(
     channel: MessageChannel
 ): Message? {
     try {
-        return channel.retrieveMessageById(fav.messageId).await()
+        return channel.retrieveMessageById(fav.messageId).submit().await()
     } catch (e: Exception) {
         with(e.message.orEmpty()) {
             if (contains("10008: Unknown Message")) {
@@ -109,36 +110,3 @@ suspend fun EmbedBuilder.writeStats(favs: Collection<Fav>, jda: JDA) = coroutine
         addField("Lowest votes", lowestVotes.await().joinToString("\n"), true)
     }
 }
-
-fun getFavMessage() = listOf(
-    "Got one!",
-    "Wonder what this was about",
-    "This one's for the history books",
-    "Found this gem!",
-    "Already a classic",
-    "Gee, calm down",
-    "Huh?",
-    "OK Boomer",
-    "Well that was awkward",
-    "Not sure about this one",
-    "Who even thinks like this?",
-    "Anyways, here's this one",
-    "That was bait, wasn't it?",
-    "Uhm, who let this one in?",
-    "HAHAHAHAAHAHAAHAHA",
-    "Oof, this explains so much",
-    "You think you're funny?",
-    "Really? I mean... Really?",
-    "Oh yeah!",
-    "(☞ﾟヮﾟ)☞",
-    "(⌐■_■)"
-).random()
-
-fun getQuoteMessage() = listOf(
-    "Found it!",
-    "Hope this one is useful",
-    "Well look at that",
-    "Isn't that interesting",
-    "So that's what this was about",
-    "A quote for the history books"
-).random()

@@ -1,6 +1,5 @@
 package erdmaschine.bot.commands
 
-import erdmaschine.bot.await
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.reddit.RedditFacade
 import net.dv8tion.jda.api.Permission
@@ -90,5 +89,5 @@ suspend fun executeConfigureRedditCommand(
     event.interaction
         .reply(message)
         .setEphemeral(true)
-        .await()
+        .submit()
 }
