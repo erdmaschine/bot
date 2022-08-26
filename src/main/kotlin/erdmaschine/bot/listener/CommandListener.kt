@@ -40,7 +40,7 @@ class CommandListener(
                 guild.retrieveCommands().submit().await().forEach { command ->
                     try {
                         log.info("Removing command [{}] from guild [{}]", command.name, guild)
-                        guild.deleteCommandById(command.id)
+                        guild.deleteCommandById(command.id).submit()
                     } catch (_: Exception) {
                     }
                 }
