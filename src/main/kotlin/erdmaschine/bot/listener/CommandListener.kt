@@ -41,7 +41,8 @@ class CommandListener(
                     try {
                         log.info("Removing command [{}] from guild [{}]", command.name, guild)
                         guild.deleteCommandById(command.id).submit()
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        log.warn("Could not remove guild command: ${e.message}", e)
                     }
                 }
             }
