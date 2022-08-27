@@ -26,7 +26,7 @@ val QuoteCommand = Commands.slash("quote", "quote message")
     )
 
 suspend fun executeQuoteCommand(event: SlashCommandInteractionEvent) {
-    event.deferReply()
+    event.deferReply().submit()
 
     val messageLink = event.getOption(OPTION_LINK)?.asString.orEmpty()
     val tokenizedLink = messageLink.substringAfter("/channels/", "").split("/")
