@@ -55,7 +55,7 @@ class ReactionListener(
         val message = event.retrieveMessage().submit().await()
         val author = message.author
 
-        if (author.isBot) {
+        if (event.jda.selfUser.id == author.id) {
             return
         }
 

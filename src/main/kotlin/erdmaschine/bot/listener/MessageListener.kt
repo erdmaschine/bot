@@ -23,7 +23,7 @@ class MessageListener(
             return@runBlocking
         }
 
-        if (message.author.isBot) {
+        if (event.jda.selfUser.id == message.author.id) {
             return@runBlocking
         }
 
