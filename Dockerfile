@@ -5,7 +5,7 @@ WORKDIR /app
 COPY src src
 COPY pom.xml pom.xml
 
-RUN ["mvn", "-B", "compile", "--file", "pom.xml"]
+RUN ["mvn", "-B", "package", "--file", "pom.xml"]
 
 FROM openjdk:slim as final
 
