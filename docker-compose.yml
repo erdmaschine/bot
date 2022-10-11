@@ -1,0 +1,17 @@
+services:
+  app:
+    container_name: erdmaschine_app
+    build: .
+    depends_on:
+      - db
+    environment:
+      JDBC_DATABASE_URL: "jdbc:postgresql://db/postgres?user=postgres&password=postgres"
+      AUTH_TOKEN: "<fill_this>"
+      REDDIT_CLIENT_ID: "<fill_this>"
+      REDDIT_CLIENT_SECRET: "<fill_this>"
+
+  db:
+    container_name: erdmaschine_db
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
