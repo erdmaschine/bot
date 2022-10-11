@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY ["src", "pom.xml", "/"]
 
+RUN ["ls", "-la"]
 RUN ["mvn", "-B", "package", "--file", "pom.xml"]
 
 FROM openjdk:slim as final
