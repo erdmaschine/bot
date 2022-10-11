@@ -2,7 +2,8 @@ FROM maven:latest as build
 
 WORKDIR /app
 
-COPY ["src/", "pom.xml", "./"]
+COPY src src
+COPY pom.xml pom.xml
 
 RUN ["ls", "-la"]
 RUN ["mvn", "-B", "package", "--file", "pom.xml"]
