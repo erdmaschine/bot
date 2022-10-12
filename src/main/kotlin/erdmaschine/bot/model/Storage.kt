@@ -16,6 +16,7 @@ class Storage(env: Env) {
     private val log = LoggerFactory.getLogger(this::class.java)!!
     private val dataSource = HikariDataSource()
         .also {
+            it.connectionTimeout = 30
             it.initializationFailTimeout = 30
             it.jdbcUrl = env.dbUrl
         }
