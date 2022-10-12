@@ -14,7 +14,11 @@ import javax.sql.DataSource
 class Storage(env: Env) {
 
     private val log = LoggerFactory.getLogger(this::class.java)!!
-    private val dataSource = HikariDataSource().also { it.jdbcUrl = env.dbUrl }
+    private val dataSource = HikariDataSource()
+        .also {
+            it.initializationFailTimeout = 30
+            it.jdbcUrl = env.dbUrl
+        }
     private val postHistoryThreshold = env.redditPostHistoryThreshold.ifEmpty { "168" }.toLong()
 
     init {
