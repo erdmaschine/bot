@@ -1,0 +1,21 @@
+services:
+  app:
+    container_name: erdmaschine_app
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      JDBC_DATABASE_URL: "jdbc:postgresql://db/postgres?user=postgres&password=postgres"
+      AUTH_TOKEN: "${ERDMASCHINE_AUTH_TOKEN}"
+      REDDIT_CLIENT_ID: "${ERDMASCHINE_REDDIT_CLIENT_ID}"
+      REDDIT_CLIENT_SECRET: "${ERDMASCHINE_REDDIT_CLIENT_SECRET}"
+
+  db:
+    container_name: erdmaschine_db
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
