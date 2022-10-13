@@ -15,5 +15,7 @@ services:
     container_name: erdmaschine_db
     image: postgres
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:26152:5432"
     environment:
       POSTGRES_PASSWORD: "${DB_PW}"
