@@ -33,13 +33,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.7.10" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.2.11" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.2.11" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.32" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.7.20" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.20" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.20" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.4.3" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.4.3" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.1" level="project" />
     <orderEntry type="library" name="Maven: net.dv8tion:JDA:5.0.0-alpha.5" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:16.0.1" level="project" />
@@ -53,13 +53,13 @@
     <orderEntry type="library" name="Maven: io.github.cdimascio:dotenv-java:2.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-core:0.38.2" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-reflect:1.6.20" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-dao:0.38.2" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-jdbc:0.38.2" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-kotlin-datetime:0.38.2" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-core:0.39.2" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-reflect:1.7.10" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-dao:0.39.2" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-jdbc:0.39.2" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.exposed:exposed-kotlin-datetime:0.39.2" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.postgresql:postgresql:42.3.6" level="project" />
+    <orderEntry type="library" name="Maven: org.postgresql:postgresql:42.5.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.checkerframework:checker-qual:3.5.0" level="project" />
     <orderEntry type="library" name="Maven: com.zaxxer:HikariCP:5.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-rng-sampling:1.4" level="project" />

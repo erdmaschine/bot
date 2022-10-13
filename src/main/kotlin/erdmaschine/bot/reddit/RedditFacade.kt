@@ -50,9 +50,9 @@ class RedditFacade(env: Env) {
                 val body = response.body?.string().orEmpty()
 
                 if (!response.isSuccessful) {
-                    var errorString = "HTML response body"
-                    if (!body.contains("<html>")) {
-                        errorString = body
+                    val errorString = when (body.contains("<html>")) {
+                        true -> "<clipped html body>"
+                        else -> body
                     }
                     throw Exception("Error ${response.code} fetching listing [${sub.link}]: $errorString")
                 }
