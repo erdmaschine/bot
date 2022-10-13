@@ -6,7 +6,7 @@ services:
     depends_on:
       - db
     environment:
-      JDBC_DATABASE_URL: "jdbc:postgresql://db/postgres?user=${DB_USER}&password=${DB_PW}"
+      JDBC_DATABASE_URL: "jdbc:postgresql://db/postgres?user=postgres&password=${DB_PW}"
       AUTH_TOKEN: "${AUTH_TOKEN}"
       REDDIT_CLIENT_ID: "${REDDIT_CLIENT_ID}"
       REDDIT_CLIENT_SECRET: "${REDDIT_CLIENT_SECRET}"
@@ -17,4 +17,3 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: "${DB_PW}"
-      POSTGRES_USER: "${DB_USER}"
