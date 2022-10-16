@@ -51,7 +51,7 @@ class RedditFacade(env: Env) {
 
                 if (!response.isSuccessful) {
                     val message = when {
-                        response.code == 401 -> "Authorization failed. Refreshing token"
+                        response.code == 401 -> "Authorization failed. Dumping token... $token"
                         body.startsWith("<!doctype html>", ignoreCase = true) -> "<clipped html body>"
                         else -> body
                     }
@@ -90,7 +90,7 @@ class RedditFacade(env: Env) {
             val body = response.body?.string().orEmpty()
 
             if (!response.isSuccessful) {
-                throw Exception("Error getting reddit token: $body")
+                throw Exception("Error ${response.code} getting reddit token: $body")
             }
 
             gson.fromJson(body, Token::class.java).also { token = it }
