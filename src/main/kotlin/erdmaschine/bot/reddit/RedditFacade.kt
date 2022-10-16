@@ -50,11 +50,12 @@ class RedditFacade(env: Env) {
                 val body = response.body?.string().orEmpty()
 
                 if (!response.isSuccessful) {
-                    val errorString = when (body.contains("<html>")) {
-                        true -> "<clipped html body>"
+                    val message = when {
+                        response.code == 401 -> "Authorization failed. Refreshing token"
+                        body.startsWith("<!doctype html>", ignoreCase = true) -> "<clipped html body>"
                         else -> body
                     }
-                    throw Exception("Error ${response.code} fetching listing [${sub.link}]: $errorString")
+                    throw Exception("Error ${response.code} fetching listing [${sub.link}]: $message")
                 }
 
                 log.info("Fetched [${sub.link}]")
