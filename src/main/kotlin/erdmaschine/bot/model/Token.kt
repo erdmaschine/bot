@@ -1,13 +1,12 @@
 package erdmaschine.bot.model
 
-import java.util.*
+import java.time.Instant
 
 data class Token(
     val access_token: String,
-    val token_type: String,
-    val device_id: String,
-    val expires_in: Long,
-    val scope: String,
+    private val expires_in: Long,
 ) {
-    fun isValid() = Date().toInstant() < Date().toInstant().plusSeconds(expires_in)
+    private val validUntil = Instant.now().plusSeconds(expires_in)
+
+    fun isValid() = Instant.now() < validUntil
 }

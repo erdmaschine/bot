@@ -51,7 +51,6 @@ class RedditFacade(env: Env) {
 
                 if (!response.isSuccessful) {
                     val message = when {
-                        response.code == 401 -> "Authorization failed. Dumping token... $token"
                         body.startsWith("<!doctype html>", ignoreCase = true) -> "<clipped html body>"
                         else -> body
                     }
