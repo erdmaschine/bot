@@ -4,13 +4,15 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import erdmaschine.bot.Env
 import erdmaschine.bot.model.RedditListingThing
+import erdmaschine.bot.model.RedditToken
+import erdmaschine.bot.model.RedditTokenResponse
 import erdmaschine.bot.model.Sub
-import erdmaschine.bot.model.Token
 import okhttp3.*
 import org.slf4j.LoggerFactory
+import java.time.Clock
 import java.util.*
 
-class RedditFacade(env: Env) {
+class RedditFacade(env: Env, private val clock: Clock) {
 
     private val log = LoggerFactory.getLogger(this::class.java)!!
 
@@ -20,7 +22,7 @@ class RedditFacade(env: Env) {
     private val deviceId = UUID.randomUUID().toString()
     private val credentials = Credentials.basic(env.redditClientId, env.redditClientSecret)
 
-    private var token: Token? = null
+    private var token: RedditToken? = null
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(Interceptor { chain ->
@@ -43,7 +45,7 @@ class RedditFacade(env: Env) {
             val token = getToken()
             val listing = Request.Builder()
                 .url("https://oauth.reddit.com${sub.link}")
-                .header("Authorization", "Bearer ${token.access_token}")
+                .header("Authorization", "Bearer ${token.accessTokenString}")
                 .build()
 
             client.newCall(listing).execute().use { response ->
@@ -65,9 +67,9 @@ class RedditFacade(env: Env) {
         return result
     }
 
-    private fun getToken(): Token {
+    private fun getToken(): RedditToken {
         token?.let {
-            if (it.isValid()) {
+            if (it.isValid(clock)) {
                 return it
             }
             log.info("Reddit token expired, refetching")
@@ -92,7 +94,8 @@ class RedditFacade(env: Env) {
                 throw Exception("Error ${response.code} getting reddit token: $body")
             }
 
-            gson.fromJson(body, Token::class.java).also { token = it }
+            val tokenResponse = gson.fromJson(body, RedditTokenResponse::class.java)
+            RedditToken(tokenResponse, clock)
         }
     }
 }

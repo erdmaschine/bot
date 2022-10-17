@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
 import org.slf4j.LoggerFactory
+import java.time.Clock
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -22,7 +23,7 @@ fun main() = runBlocking {
         log.info("Starting up erdmaschine-bot")
 
         val storage = Storage(env)
-        val redditFacade = RedditFacade(env)
+        val redditFacade = RedditFacade(env, Clock.systemDefaultZone())
         val commandListener = CommandListener(storage, redditFacade)
 
         val jda = JDABuilder.createDefault(env.authToken)
