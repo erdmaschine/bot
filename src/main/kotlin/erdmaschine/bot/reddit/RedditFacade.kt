@@ -45,7 +45,7 @@ class RedditFacade(env: Env, private val clock: Clock) {
             val token = getToken()
             val listing = Request.Builder()
                 .url("https://oauth.reddit.com${sub.link}")
-                .header("Authorization", "Bearer ${token.accessTokenString}")
+                .header("Authorization", "Bearer ${token.tokenValue}")
                 .build()
 
             client.newCall(listing).execute().use { response ->
@@ -69,7 +69,7 @@ class RedditFacade(env: Env, private val clock: Clock) {
 
     private fun getToken(): RedditToken {
         token?.let {
-            if (it.isValid(clock)) {
+            if (it.isValid(clock.instant())) {
                 return it
             }
             log.info("Reddit token expired, refetching")
@@ -95,7 +95,8 @@ class RedditFacade(env: Env, private val clock: Clock) {
             }
 
             val tokenResponse = gson.fromJson(body, RedditTokenResponse::class.java)
-            RedditToken(tokenResponse, clock)
+            RedditToken(tokenResponse.access_token, clock.instant().plusSeconds(tokenResponse.expires_in))
+                .also { token = it }
         }
     }
 }
