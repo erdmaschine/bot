@@ -77,12 +77,17 @@ class RedditIntegrationRunner(env: Env) {
                         }
                     )
 
-                link.preview?.images
+                val resolutions = link.preview?.images
                     ?.firstOrNull()
                     ?.resolutions
-                    ?.maxBy { it.width }
-                    ?.url
-                    ?.let { embed.setImage(it.replace("&amp;", "&")) }
+                    .orEmpty()
+                if (!resolutions.isEmpty()) {
+                    val imageUrl = resolutions
+                        .maxBy { it.width }
+                        .url
+                        .replace("&amp;", "&")
+                    embed.setImage(imageUrl)
+                }
 
                 storage.addPostHistory(sub.guildId, sub.channelId, sub.sub, link.id)
 
