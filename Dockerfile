@@ -13,4 +13,6 @@ WORKDIR /app
 
 COPY --from=build /app/target .
 
-CMD ["java", "-cp",  "classes:dependency/*", "erdmaschine.bot.MainKt"]
+ENV JAVA_OPTS=""
+
+CMD ["java", "$JAVA_OPTS", "-cp",  "classes:dependency/*", "erdmaschine.bot.MainKt"]

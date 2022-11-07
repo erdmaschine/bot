@@ -6,6 +6,7 @@ services:
     depends_on:
       - db
     environment:
+      JAVA_OPTS: "${JAVA_OPTS}"
       JDBC_DATABASE_URL: "jdbc:postgresql://db/postgres?user=postgres&password=${DB_PW}"
       AUTH_TOKEN: "${AUTH_TOKEN}"
       DEPLOY_COMMANDS_GLOBAL: "${DEPLOY_COMMANDS_GLOBAL}"
