@@ -15,4 +15,4 @@ COPY --from=build /app/target .
 
 ENV JAVA_OPTS=""
 
-CMD ["java", "$JAVA_OPTS", "-cp",  "classes:dependency/*", "erdmaschine.bot.MainKt"]
+CMD "java $JAVA_OPTS -cp classes:dependency/* erdmaschine.bot.MainKt"
