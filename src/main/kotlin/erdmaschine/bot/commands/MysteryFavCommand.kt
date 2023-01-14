@@ -1,11 +1,14 @@
 package erdmaschine.bot.commands
 
+import dev.minn.jda.ktx.generics.getChannel
 import erdmaschine.bot.forMessage
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.replyError
 import erdmaschine.bot.weightedRandom
 import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -51,8 +54,7 @@ suspend fun executeMysteryFavCommand(storage: Storage, event: SlashCommandIntera
     val guild = event.jda.guilds
         .firstOrNull { it.id == fav.guildId }
         ?: return event.hook.replyError("Guild not found:\n${fav.guildUrl()}", fav.id)
-    val channel = guild.getTextChannelById(fav.channelId)
-        ?: guild.getThreadChannelById(fav.channelId)
+    val channel = guild.getChannel<GuildMessageChannel>(fav.channelId)
         ?: return event.hook.replyError("Channel not found:\n${fav.channelUrl()}", fav.id)
 
     val message = retrieveMessageWithErrorHandling(fav, storage, event.hook, channel) ?: return
@@ -67,8 +69,8 @@ suspend fun executeMysteryFavCommand(storage: Storage, event: SlashCommandIntera
 
     try {
         val original = event.hook.retrieveOriginal().submit().await()
-        original.addReaction("👍").submit()
-        original.addReaction("👎").submit()
+        original.addReaction(Emoji.fromUnicode("👍")).submit()
+        original.addReaction(Emoji.fromUnicode("👎")).submit()
     } catch (exc: Exception) {
         LOG.warn(exc.message, exc)
     }

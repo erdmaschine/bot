@@ -5,6 +5,7 @@ import erdmaschine.bot.model.Storage
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent
@@ -15,11 +16,11 @@ class ReactionListener(
 ) : ListenerAdapter() {
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) = runBlocking {
-        val code = with(event.reaction.reactionEmote) {
-            if (!isEmoji) {
+        val code = with(event.reaction.emoji) {
+            if (type != Emoji.Type.UNICODE) {
                 return@runBlocking
             }
-            asCodepoints
+            asUnicode().asCodepoints
         }
 
         when (code) {
@@ -33,11 +34,11 @@ class ReactionListener(
     }
 
     override fun onMessageReactionRemove(event: MessageReactionRemoveEvent) = runBlocking {
-        val code = with(event.reaction.reactionEmote) {
-            if (!isEmoji) {
+        val code = with(event.reaction.emoji) {
+            if (type != Emoji.Type.UNICODE) {
                 return@runBlocking
             }
-            asCodepoints
+            asUnicode().asCodepoints
         }
 
         when (code) {
@@ -48,10 +49,6 @@ class ReactionListener(
     }
 
     private suspend fun addFav(event: MessageReactionAddEvent) {
-        if (event.reaction.guild == null) {
-            return
-        }
-
         val message = event.retrieveMessage().submit().await()
         val author = message.author
 

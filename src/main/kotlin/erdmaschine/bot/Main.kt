@@ -9,6 +9,7 @@ import erdmaschine.bot.reddit.RedditIntegrationRunner
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.requests.GatewayIntent
 import org.slf4j.LoggerFactory
 import java.time.Clock
 import kotlin.time.ExperimentalTime
@@ -25,13 +26,11 @@ fun main() = runBlocking {
         val storage = Storage(env)
         val redditFacade = RedditFacade(env, Clock.systemDefaultZone())
         val commandListener = CommandListener(storage, redditFacade)
+        val reactionListener = ReactionListener(storage)
+        val messageListener = MessageListener(storage)
 
-        val jda = JDABuilder.createDefault(env.authToken)
-            .addEventListeners(
-                ReactionListener(storage),
-                MessageListener(storage),
-                commandListener
-            )
+        val jda = JDABuilder.createDefault(env.authToken, GatewayIntent.MESSAGE_CONTENT)
+            .addEventListeners(reactionListener, messageListener, commandListener)
             .build()
 
         jda.awaitReady()

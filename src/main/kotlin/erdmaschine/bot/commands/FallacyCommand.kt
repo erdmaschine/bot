@@ -1,12 +1,15 @@
 package erdmaschine.bot.commands
 
+import dev.minn.jda.ktx.generics.getChannel
 import erdmaschine.bot.model.Fallacies
 import erdmaschine.bot.replyError
 import kotlinx.coroutines.future.await
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
+import net.dv8tion.jda.api.utils.FileUpload
 
 private const val OPTION_LINK = "link"
 
@@ -37,16 +40,17 @@ suspend fun executeFallacyCommand(event: SlashCommandInteractionEvent) {
         val messageId = tokenizedLink[2]
 
         val guild = event.jda.guilds.firstOrNull { it.id == guildId }
-        val channel = guild?.getTextChannelById(channelId) ?: guild?.getThreadChannelById(channelId)
+        val channel = guild?.getChannel<GuildMessageChannel>(channelId)
+
         val message = channel?.retrieveMessageById(messageId)?.submit()?.await()
             ?: return event.hook.replyError("No message found at that link!")
 
         message.reply("<@${event.user.id}> accuses you of using a fallacy!")
-            .addFile(data.readBytes(), filename)
+            .addFiles(FileUpload.fromData(data.readBytes(), filename))
             .submit()
         event.hook.sendMessage("Fallacy reply done!").submit()
     } else {
         event.deferReply().submit()
-        event.hook.sendFile(data.readBytes(), filename).submit()
+        event.hook.sendFiles(FileUpload.fromData(data.readBytes(), filename)).submit()
     }
 }

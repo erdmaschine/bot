@@ -9,8 +9,8 @@ import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.interactions.InteractionHook
 
 suspend fun JDA.getUser(userId: String): User =
@@ -67,7 +67,7 @@ suspend fun retrieveMessageWithErrorHandling(
     fav: Fav,
     storage: Storage,
     interaction: InteractionHook,
-    channel: MessageChannel
+    channel: GuildMessageChannel
 ): Message? {
     try {
         return channel.retrieveMessageById(fav.messageId).submit().await()

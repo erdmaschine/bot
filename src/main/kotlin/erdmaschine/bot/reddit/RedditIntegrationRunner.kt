@@ -6,7 +6,7 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.MessageChannel
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import org.slf4j.LoggerFactory
 import java.awt.Color
 import java.util.*
@@ -51,7 +51,7 @@ class RedditIntegrationRunner(env: Env) {
                     return@forEach
                 }
 
-                if (channel !is MessageChannel) {
+                if (channel !is TextChannel) {
                     storage.removeSub(sub.guildId, sub.channelId, sub.sub)
                     return@forEach
                 }
@@ -91,7 +91,7 @@ class RedditIntegrationRunner(env: Env) {
 
                 storage.addPostHistory(sub.guildId, sub.channelId, sub.sub, link.id)
 
-                (channel as MessageChannel).sendMessageEmbeds(embed.build()).submit()
+                channel.sendMessageEmbeds(embed.build()).submit()
             }
 
             log.info("Runner finished, next run in [$interval]ms")

@@ -7,6 +7,8 @@ import erdmaschine.bot.replyError
 import erdmaschine.bot.weightedRandom
 import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -73,7 +75,7 @@ suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEv
         ?: guild.getThreadChannelById(fav.channelId)
         ?: return event.hook.replyError("Channel not found:\n${fav.channelUrl()}", fav.id)
 
-    val message = retrieveMessageWithErrorHandling(fav, storage, event.hook, channel) ?: return
+    val message = retrieveMessageWithErrorHandling(fav, storage, event.hook, channel as TextChannel) ?: return
 
     val sponge = event.getOption(OPTION_SPONGE)?.asBoolean == true
     val uwu = event.getOption(OPTION_UWU)?.asBoolean == true
@@ -83,8 +85,8 @@ suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEv
 
     try {
         val original = event.hook.retrieveOriginal().submit().await()
-        original.addReaction("👍").submit()
-        original.addReaction("👎").submit()
+        original.addReaction(Emoji.fromUnicode("👍")).submit()
+        original.addReaction(Emoji.fromUnicode("👎")).submit()
     } catch (exc: Exception) {
         LOG.warn(exc.message, exc)
     }

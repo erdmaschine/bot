@@ -3,7 +3,8 @@ package erdmaschine.bot.listener
 import erdmaschine.bot.model.Storage
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
-import net.dv8tion.jda.api.entities.ChannelType
+import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
@@ -54,7 +55,7 @@ class MessageListener(
         }
 
         storage.writeTags(favId, tags)
-        message.addReaction("✅").submit()
+        message.addReaction(Emoji.fromUnicode("✅")).submit()
     }
 
 }

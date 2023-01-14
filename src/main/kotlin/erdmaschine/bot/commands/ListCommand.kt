@@ -3,11 +3,11 @@ package erdmaschine.bot.commands
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.replyError
 import net.dv8tion.jda.api.EmbedBuilder
-import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 import java.awt.Color
 
 private const val OPTION_TAG = "tag"
@@ -61,7 +61,7 @@ suspend fun executeListCommand(storage: Storage, event: SlashCommandInteractionE
             }
             event
                 .channel
-                .sendMessage(MessageBuilder().setEmbeds(embeds).build())
+                .sendMessage(MessageCreateBuilder().setEmbeds(embeds).build())
                 .submit()
         }
 }

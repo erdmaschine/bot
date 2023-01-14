@@ -3,6 +3,7 @@ package erdmaschine.bot.commands
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.reddit.RedditFacade
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -58,7 +59,11 @@ suspend fun executeConfigureRedditCommand(
     redditFacade: RedditFacade,
     event: SlashCommandInteractionEvent
 ) {
-    val channel = event.getOption(OPTION_CHANNEL)?.asMessageChannel ?: throw Exception("Invalid channel type")
+    val channel = event.getOption(OPTION_CHANNEL)?.asChannel ?: throw Exception("Channel option missing")
+    if (channel.type != ChannelType.TEXT) {
+        throw Exception("Invalid channel type")
+    }
+
     if (!PermissionUtil.checkPermission(channel.permissionContainer, event.member, Permission.MESSAGE_MANAGE)) {
         throw Exception("You are not authorized to configure reddit integration for that channel")
     }
