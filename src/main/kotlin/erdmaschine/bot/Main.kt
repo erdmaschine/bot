@@ -29,7 +29,8 @@ fun main() = runBlocking {
         val reactionListener = ReactionListener(storage)
         val messageListener = MessageListener(storage)
 
-        val jda = JDABuilder.createDefault(env.authToken, GatewayIntent.MESSAGE_CONTENT)
+        val jda = JDABuilder.createDefault(env.authToken)
+            .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MESSAGE_REACTIONS)
             .addEventListeners(reactionListener, messageListener, commandListener)
             .build()
 

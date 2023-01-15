@@ -7,7 +7,6 @@ import erdmaschine.bot.replyError
 import erdmaschine.bot.weightedRandom
 import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.EmbedBuilder
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -75,7 +74,7 @@ suspend fun executeFavCommand(storage: Storage, event: SlashCommandInteractionEv
         ?: guild.getThreadChannelById(fav.channelId)
         ?: return event.hook.replyError("Channel not found:\n${fav.channelUrl()}", fav.id)
 
-    val message = retrieveMessageWithErrorHandling(fav, storage, event.hook, channel as TextChannel) ?: return
+    val message = retrieveMessageWithErrorHandling(fav, storage, event.hook, channel) ?: return
 
     val sponge = event.getOption(OPTION_SPONGE)?.asBoolean == true
     val uwu = event.getOption(OPTION_UWU)?.asBoolean == true
