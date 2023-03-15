@@ -23,6 +23,7 @@ private val slashCommandData = listOf(
     SpongeCommand,
     UwuCommand,
     FallacyCommand,
+    RanickiCommand
 )
 
 class CommandListener(
@@ -68,6 +69,7 @@ class CommandListener(
                 SpongeCommand.name -> executeSpongeCommand(event)
                 UwuCommand.name -> executeUwuCommand(event)
                 FallacyCommand.name -> executeFallacyCommand(event)
+                RanickiCommand.name -> executeRanickiCommand(event)
                 else -> Unit
             }
         } catch (e: Exception) {

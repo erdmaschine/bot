@@ -1,30 +1,30 @@
 package erdmaschine.bot.commands
 
 import dev.minn.jda.ktx.generics.getChannel
-import erdmaschine.bot.model.Fallacies
+import erdmaschine.bot.model.RanickiClips
 import erdmaschine.bot.replyError
 import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
-import net.dv8tion.jda.api.utils.FileUpload
 
 private const val OPTION_LINK = "link"
+private const val OPTION_KEYWORD = "keyword"
 
-private val subCommands = Fallacies.map { (name, description) ->
-    SubcommandData(name, description)
-        .addOption(OptionType.STRING, OPTION_LINK, "Link to the message to post this fallacy as reply to")
-}
+val RanickiCommand = Commands.slash("ranicki", "Post an out of context Ranicki clip")
+    .addOption(OptionType.STRING, OPTION_KEYWORD, "Keyword to search for clip", true)
+    .addOption(OptionType.STRING, OPTION_LINK, "Link to the message to post the clip as reply to")
 
-val FallacyCommand = Commands.slash("fallacy", "Post a fallacy referee image")
-    .addSubcommands(subCommands)
+suspend fun executeRanickiCommand(event: SlashCommandInteractionEvent) {
+    val keyword = event.getOption(OPTION_KEYWORD)?.asString
+        ?: throw Exception("Keyword option is required")
 
-suspend fun executeFallacyCommand(event: SlashCommandInteractionEvent) {
-    val filename = "${event.subcommandName}.jpg"
-    val data = object {}.javaClass.getResource("/fallacies/$filename")
-        ?: throw Exception("Unknown subcommand or image file not found")
+    val clipUrl = RanickiClips
+        .filter { entry -> entry.key.contains(keyword) }
+        .map { it.value }
+        .firstOrNull()
+        ?: throw Exception("No clip found for keyword")
 
     val messageLink = event.getOption(OPTION_LINK)?.asString.orEmpty()
     if (messageLink.isNotBlank()) {
@@ -45,12 +45,12 @@ suspend fun executeFallacyCommand(event: SlashCommandInteractionEvent) {
         val message = channel?.retrieveMessageById(messageId)?.submit()?.await()
             ?: return event.hook.replyError("No message found at that link!")
 
-        message.reply("<@${event.user.id}> accuses you of using a fallacy!")
-            .addFiles(FileUpload.fromData(data.readBytes(), filename))
+        message
+            .reply(clipUrl)
             .submit()
-        event.hook.sendMessage("Fallacy reply done!").submit()
+        event.hook.sendMessage("Ranicki clip reply done!").submit()
     } else {
         event.deferReply().submit()
-        event.hook.sendFiles(FileUpload.fromData(data.readBytes(), filename)).submit()
+        event.hook.sendMessage(clipUrl).submit()
     }
 }
