@@ -48,7 +48,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.jackson.core:jackson-core:2.14.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.14.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.14.1" level="project" />
-    <orderEntry type="library" name="Maven: com.github.minndevelopment:jda-ktx:17eb77a138ba356a3b0439afeddf77d4520c7c60" level="project" />
+    <orderEntry type="library" name="Maven: com.github.minndevelopment:jda-ktx:9fc90f616b7c9b68b8680c7bf37d6af361bb0fbb" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: io.github.cdimascio:dotenv-kotlin:6.4.0" level="project" />
     <orderEntry type="library" name="Maven: io.github.cdimascio:dotenv-java:2.3.1" level="project" />
