@@ -9,8 +9,5 @@
         <module name="bot" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="bot" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

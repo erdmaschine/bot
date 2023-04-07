@@ -5,7 +5,9 @@ import erdmaschine.bot.model.RanickiClips
 import erdmaschine.bot.replyError
 import kotlinx.coroutines.future.await
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 
@@ -13,7 +15,7 @@ private const val OPTION_LINK = "link"
 private const val OPTION_KEYWORD = "keyword"
 
 val RanickiCommand = Commands.slash("ranicki", "Post an out of context Ranicki clip")
-    .addOption(OptionType.STRING, OPTION_KEYWORD, "Keyword to search for clip", true)
+    .addOption(OptionType.STRING, OPTION_KEYWORD, "Keyword to search for clip", true, true)
     .addOption(OptionType.STRING, OPTION_LINK, "Link to the message to post the clip as reply to")
 
 suspend fun executeRanickiCommand(event: SlashCommandInteractionEvent) {
@@ -54,3 +56,13 @@ suspend fun executeRanickiCommand(event: SlashCommandInteractionEvent) {
         event.hook.sendMessage(clipUrl).submit()
     }
 }
+
+fun buildRanickiChoices(event: CommandAutoCompleteInteractionEvent): Collection<Command.Choice> =
+    when (event.focusedOption.name) {
+        OPTION_KEYWORD -> RanickiClips.keys.flatten()
+            .filter { it.contains(event.focusedOption.value) }
+            .take(25)
+            .map { Command.Choice(it, it) }
+
+        else -> listOf()
+    }

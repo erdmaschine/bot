@@ -8,9 +8,11 @@ import erdmaschine.bot.replyError
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.slf4j.LoggerFactory
+
 
 private val slashCommandData = listOf(
     ListCommand,
@@ -78,6 +80,19 @@ class CommandListener(
                 else -> event.reply("Whoopsie (╯°□°）╯︵ ┻━┻").setEphemeral(true).submit().await()
             }
             interaction.replyError(e.message ?: "Unknown error")
+            log.error(e.message, e)
+        }
+    }
+
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+        try {
+            val choices = when (event.name) {
+                FallacyCommand.name -> buildFallacyChoices(event)
+                RanickiCommand.name -> buildRanickiChoices(event)
+                else -> listOf()
+            }
+            event.replyChoices(choices).queue()
+        } catch (e: Exception) {
             log.error(e.message, e)
         }
     }
