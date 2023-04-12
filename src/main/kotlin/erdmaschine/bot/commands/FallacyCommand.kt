@@ -56,14 +56,19 @@ suspend fun executeFallacyCommand(event: SlashCommandInteractionEvent) {
 
 fun buildFallacyChoices(event: CommandAutoCompleteInteractionEvent): Collection<Choice> =
     when (event.focusedOption.name) {
-        OPTION_NAME -> Fallacies.map { (value, description) ->
-            val label = "$value: $description"
-            val name = when (label.length > 100) {
-                true -> label.take(97) + "..."
-                else -> label
+        OPTION_NAME -> Fallacies
+            .filter { (value, description) ->
+                "$value $description".contains(event.focusedOption.value)
             }
-            Choice(name, value)
-        }
+            .map { (value, description) ->
+                val label = "$value: $description"
+                val name = when (label.length > 100) {
+                    true -> label.take(97) + "..."
+                    else -> label
+                }
+                Choice(name, value)
+            }
+            .take(25)
 
         else -> listOf()
     }
