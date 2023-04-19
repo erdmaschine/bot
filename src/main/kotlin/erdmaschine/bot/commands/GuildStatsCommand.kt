@@ -14,7 +14,7 @@ suspend fun executeGuildStats(storage: Storage, event: SlashCommandInteractionEv
     val favs = storage.getFavs(null, event.guild?.id, emptyList())
     event.hook.editOriginalEmbeds(
         EmbedBuilder()
-            .setTitle("Server Stats")
+            .setTitle("Server Fav Stats")
             .setColor(Color(20, 150, 115))
             .writeStats(favs, event.jda)
             .build()

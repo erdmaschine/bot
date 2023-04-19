@@ -8,6 +8,7 @@ import kotlinx.datetime.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
@@ -26,7 +27,7 @@ class Storage(env: Env) {
         transaction(Database.connect(dataSource)) {
             addLogger(Slf4jSqlDebugLogger)
             SchemaUtils.createMissingTablesAndColumns(
-                Favs, PostHistory, Subs,
+                Favs, PostHistory, Subs, EmojiUsages,
                 inBatch = true, withLogs = true
             )
         }
@@ -217,6 +218,36 @@ class Storage(env: Env) {
             }
             if (deleted > 0) {
                 log.info("Cleaned up $deleted post histories before ${threshold.toLocalDateTime(TimeZone.currentSystemDefault())}")
+            }
+        }
+    }
+
+    suspend fun getEmojiUsages(guildId: String?): List<EmojiUsage> {
+        return query(dataSource) {
+            val query = EmojiUsages.selectAll()
+
+            if (guildId != null) {
+                query.andWhere { EmojiUsages.guildId eq guildId }
+            }
+
+            query.orderBy(EmojiUsages.used to SortOrder.DESC)
+                .limit(25)
+                .map { EmojiUsage.fromResultRow(it) }
+        }
+    }
+
+    suspend fun updateEmojiUsage(guildId: String, emojiName: String) {
+        log.info("Updating emoji used of emoji [$emojiName] on guild [$guildId]")
+        val whereExpression = (EmojiUsages.emojiName eq emojiName) and
+                (EmojiUsages.guildId eq guildId)
+        query(dataSource) {
+            EmojiUsages.insertIgnore {
+                it[EmojiUsages.guildId] = guildId
+                it[EmojiUsages.emojiName] = emojiName
+                it[EmojiUsages.used] = 0
+            }
+            EmojiUsages.update({ whereExpression }) {
+                it.update(EmojiUsages.used, EmojiUsages.used + 1)
             }
         }
     }

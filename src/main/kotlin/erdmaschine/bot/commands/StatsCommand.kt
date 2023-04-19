@@ -24,7 +24,7 @@ suspend fun executeStatsCommand(storage: Storage, event: SlashCommandInteraction
 
     event.hook.editOriginalEmbeds(
         EmbedBuilder()
-            .setTitle("${event.user.name} Stats")
+            .setTitle("${event.user.name} Fav Stats")
             .setColor(Color(20, 150, 115))
             .writeStats(favs, event.jda)
             .build()
