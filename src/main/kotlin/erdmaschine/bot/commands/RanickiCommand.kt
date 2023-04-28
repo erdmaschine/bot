@@ -1,10 +1,6 @@
 package erdmaschine.bot.commands
 
-import dev.minn.jda.ktx.generics.getChannel
 import erdmaschine.bot.model.RanickiClips
-import erdmaschine.bot.replyError
-import kotlinx.coroutines.future.await
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.Command
@@ -30,24 +26,7 @@ suspend fun executeRanickiCommand(event: SlashCommandInteractionEvent) {
 
     val messageLink = event.getOption(OPTION_LINK)?.asString.orEmpty()
     if (messageLink.isNotBlank()) {
-        event.deferReply().setEphemeral(true).submit()
-
-        val tokenizedLink = messageLink.substringAfter("/channels/", "").split("/")
-        if (tokenizedLink.size != 3) {
-            return event.hook.replyError("Invalid link format!")
-        }
-
-        val guildId = tokenizedLink[0]
-        val channelId = tokenizedLink[1]
-        val messageId = tokenizedLink[2]
-
-        val guild = event.jda.guilds.firstOrNull { it.id == guildId }
-        val channel = guild?.getChannel<GuildMessageChannel>(channelId)
-
-        val message = channel?.retrieveMessageById(messageId)?.submit()?.await()
-            ?: return event.hook.replyError("No message found at that link!")
-
-        message
+        findMessageLink(event, messageLink)
             .reply(clipUrl)
             .submit()
         event.hook.sendMessage("Ranicki clip reply done!").submit()

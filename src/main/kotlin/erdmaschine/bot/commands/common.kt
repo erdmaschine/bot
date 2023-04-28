@@ -1,5 +1,6 @@
 package erdmaschine.bot.commands
 
+import dev.minn.jda.ktx.generics.getChannel
 import erdmaschine.bot.model.Fav
 import erdmaschine.bot.model.Storage
 import erdmaschine.bot.replyError
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionHook
 
 suspend fun JDA.getUser(userId: String): User =
@@ -109,4 +111,23 @@ suspend fun EmbedBuilder.writeStats(favs: Collection<Fav>, jda: JDA) = coroutine
         addField("Highest votes", highestVotes.await().joinToString("\n"), true)
         addField("Lowest votes", lowestVotes.await().joinToString("\n"), true)
     }
+}
+
+suspend fun findMessageLink(event: SlashCommandInteractionEvent, messageLink: String): Message {
+    event.deferReply().setEphemeral(true).submit()
+
+    val tokenizedLink = messageLink.substringAfter("/channels/", "").split("/")
+    if (tokenizedLink.size != 3) {
+        throw Exception("Invalid link format!")
+    }
+
+    val guildId = tokenizedLink[0]
+    val channelId = tokenizedLink[1]
+    val messageId = tokenizedLink[2]
+
+    val guild = event.jda.guilds.firstOrNull { it.id == guildId }
+    val channel = guild?.getChannel<GuildMessageChannel>(channelId)
+
+    return channel?.retrieveMessageById(messageId)?.submit()?.await()
+        ?: throw Exception("No message found at that link!")
 }

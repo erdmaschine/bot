@@ -26,7 +26,8 @@ private val slashCommandData = listOf(
     UwuCommand,
     FallacyCommand,
     RanickiCommand,
-    EmojiStatsCommand
+    EmojiStatsCommand,
+    PropagandaCommand
 )
 
 class CommandListener(
@@ -74,6 +75,7 @@ class CommandListener(
                 FallacyCommand.name -> executeFallacyCommand(event)
                 RanickiCommand.name -> executeRanickiCommand(event)
                 EmojiStatsCommand.name -> executeEmojiStats(storage, event)
+                PropagandaCommand.name -> executePropagandaCommand(event)
                 else -> Unit
             }
         } catch (e: Exception) {
@@ -91,6 +93,7 @@ class CommandListener(
             val choices = when (event.name) {
                 FallacyCommand.name -> buildFallacyChoices(event)
                 RanickiCommand.name -> buildRanickiChoices(event)
+                PropagandaCommand.name -> buildPropagandaChoices(event)
                 else -> listOf()
             }
             event.replyChoices(choices).queue()

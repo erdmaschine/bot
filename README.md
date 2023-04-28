@@ -16,3 +16,7 @@ A custom discord bot that provides various functions.
 - Create a development postgres db somehwere
 - Copy the `.env.template` file as new `.env` file and adjust accordingly
 - Run/Debug the project
+
+## Attributions
+
+* Propaganda posters CC BY-NC-SA 4.0 [Loki Gwynbleidd](https://pixelfed.fr/Lokigwyn)
