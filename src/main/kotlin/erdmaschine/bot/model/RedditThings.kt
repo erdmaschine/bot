@@ -22,6 +22,7 @@ data class RedditLink(
     val preview: RedditPreview?,
     val is_self: Boolean,
     val selftext: String,
+    val over_18: Boolean,
 )
 
 data class RedditPreview(
@@ -29,7 +30,12 @@ data class RedditPreview(
 )
 
 data class RedditPreviewImages(
-    val resolutions: Collection<RedditPreviewImageResolutions>
+    val resolutions: Collection<RedditPreviewImageResolutions>,
+    val variants: RedditPreviewImageVariants?
+)
+
+data class RedditPreviewImageVariants(
+    val obfuscated: RedditPreviewImages
 )
 
 data class RedditPreviewImageResolutions(

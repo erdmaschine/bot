@@ -60,6 +60,7 @@ class RedditIntegrationRunner(env: Env) {
 
                 val link = listingThing.data.children
                     .map { it.data }
+                    .filter { !it.over_18 || sub.nsfw }
                     .filter { !storage.isInPostHistory(sub.guildId, sub.channelId, sub.sub, it.id) }
                     .randomOrNull()
                     ?: return@forEach
@@ -77,10 +78,18 @@ class RedditIntegrationRunner(env: Env) {
                         }
                     )
 
-                val resolutions = link.preview?.images
-                    ?.firstOrNull()
-                    ?.resolutions
-                    .orEmpty()
+                val resolutions = when (link.over_18) {
+                    true -> link.preview?.images?.firstOrNull()
+                        ?.variants
+                        ?.obfuscated
+                        ?.resolutions
+                        .orEmpty()
+
+                    else -> link.preview?.images?.firstOrNull()
+                        ?.resolutions
+                        .orEmpty()
+                }
+
                 if (!resolutions.isEmpty()) {
                     val imageUrl = resolutions
                         .maxBy { it.width }

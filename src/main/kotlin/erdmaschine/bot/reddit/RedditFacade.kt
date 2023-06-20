@@ -43,7 +43,6 @@ class RedditFacade(env: Env, private val clock: Clock) {
             }
 
             try {
-
                 val token = getToken()
                 val listing = Request.Builder()
                     .url("https://oauth.reddit.com${sub.link}")
