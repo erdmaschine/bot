@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.github.minndevelopment</groupId>
             <artifactId>jda-ktx</artifactId>
-            <version>9fc90f616b</version>
+            <version>9370cb13cc64646862e6f885959d67eb4b157e4a</version>
         </dependency>
         <dependency>
             <groupId>io.github.cdimascio</groupId>

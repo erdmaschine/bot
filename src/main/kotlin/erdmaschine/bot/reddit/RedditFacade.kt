@@ -42,25 +42,30 @@ class RedditFacade(env: Env, private val clock: Clock) {
                 return@forEach
             }
 
-            val token = getToken()
-            val listing = Request.Builder()
-                .url("https://oauth.reddit.com${sub.link}")
-                .header("Authorization", "Bearer ${token.tokenValue}")
-                .build()
+            try {
 
-            client.newCall(listing).execute().use { response ->
-                val body = response.body?.string().orEmpty()
+                val token = getToken()
+                val listing = Request.Builder()
+                    .url("https://oauth.reddit.com${sub.link}")
+                    .header("Authorization", "Bearer ${token.tokenValue}")
+                    .build()
 
-                if (!response.isSuccessful) {
-                    val message = when {
-                        body.startsWith("<!doctype html>", ignoreCase = true) -> "<clipped html body>"
-                        else -> body
+                client.newCall(listing).execute().use { response ->
+                    val body = response.body?.string().orEmpty()
+
+                    if (!response.isSuccessful) {
+                        val message = when {
+                            body.startsWith("<!doctype html>", ignoreCase = true) -> "<clipped html body>"
+                            else -> body
+                        }
+                        throw Exception("Error ${response.code} fetching listing [${sub.link}]: $message")
                     }
-                    throw Exception("Error ${response.code} fetching listing [${sub.link}]: $message")
-                }
 
-                log.info("Fetched [${sub.link}]")
-                result[sub.link] = gson.fromJson(body, RedditListingThing::class.java)
+                    log.info("Fetched [${sub.link}]")
+                    result[sub.link] = gson.fromJson(body, RedditListingThing::class.java)
+                }
+            } catch (exc: Exception) {
+                log.error(exc.message, exc)
             }
         }
 
