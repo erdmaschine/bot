@@ -27,7 +27,8 @@ private val slashCommandData = listOf(
     FallacyCommand,
     RanickiCommand,
     EmojiStatsCommand,
-    PropagandaCommand
+    PropagandaCommand,
+    MiscCommand,
 )
 
 class CommandListener(
@@ -76,6 +77,7 @@ class CommandListener(
                 RanickiCommand.name -> executeRanickiCommand(event)
                 EmojiStatsCommand.name -> executeEmojiStats(storage, event)
                 PropagandaCommand.name -> executePropagandaCommand(event)
+                MiscCommand.name -> executeMiscCommand(event)
                 else -> Unit
             }
         } catch (e: Exception) {
