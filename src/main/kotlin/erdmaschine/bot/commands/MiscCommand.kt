@@ -26,7 +26,7 @@ fun executeMiscCommand(event: SlashCommandInteractionEvent) {
 private fun executeRoleReferences(event: SlashCommandInteractionEvent) {
     event.deferReply(true).submit()
 
-    if (true == event.member?.hasPermission(Permission.MANAGE_ROLES)) {
+    if (false == event.member?.hasPermission(Permission.MANAGE_ROLES)) {
         throw Exception("You are not authorized to manage roles on this server")
     }
 
