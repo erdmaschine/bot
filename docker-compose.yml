@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    volumes:
+      - ./erdmaschine.status:/var/erdmaschine.status
     environment:
       JAVA_OPTS: "${JAVA_OPTS}"
       JDBC_DATABASE_URL: "jdbc:postgresql://db/postgres?user=postgres&password=${DB_PW}"
@@ -14,6 +16,7 @@ services:
       REDDIT_CLIENT_SECRET: "${REDDIT_CLIENT_SECRET}"
       REDDIT_RUNNER_INTERVAL: "${REDDIT_RUNNER_INTERVAL}"
       REDDIT_POSTHISTORY_THRESHOLD: "${REDDIT_POSTHISTORY_THRESHOLD}"
+      STATUS_FILE: /var/erdmaschine.status
 
   db:
     container_name: erdmaschine_db

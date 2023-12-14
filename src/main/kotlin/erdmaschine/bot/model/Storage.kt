@@ -214,7 +214,7 @@ class Storage(env: Env) {
         val threshold = Clock.System.now().minus(postHistoryThreshold, DateTimeUnit.HOUR)
         query(dataSource) {
             val deleted = PostHistory.deleteWhere {
-                PostHistory.lastSeen less threshold
+                lastSeen less threshold
             }
             if (deleted > 0) {
                 log.info("Cleaned up $deleted post histories before ${threshold.toLocalDateTime(TimeZone.currentSystemDefault())}")
@@ -244,10 +244,10 @@ class Storage(env: Env) {
             EmojiUsages.insertIgnore {
                 it[EmojiUsages.guildId] = guildId
                 it[EmojiUsages.emojiName] = emojiName
-                it[EmojiUsages.used] = 0
+                it[used] = 0
             }
             EmojiUsages.update({ whereExpression }) {
-                it.update(EmojiUsages.used, EmojiUsages.used + 1)
+                it.update(used, used + 1)
             }
         }
     }

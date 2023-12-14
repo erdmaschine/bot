@@ -26,5 +26,8 @@ class Env {
     val redditPostHistoryThreshold: String
         get() = get("REDDIT_POSTHISTORY_THRESHOLD")
 
+    val statusFile: String
+        get() = get("STATUS_FILE")
+
     private fun get(name: String) = env[name].orEmpty()
 }

@@ -21,6 +21,7 @@ fun main() = runBlocking {
     val env = Env()
     val log = LoggerFactory.getLogger("erdmaschine.bot.Main")!!
     val redditIntegrationRunner = RedditIntegrationRunner(env)
+    val statusCheck = StatusCheck(env)
 
     try {
         log.info("Starting up erdmaschine-bot")
@@ -40,14 +41,14 @@ fun main() = runBlocking {
 
         jda.awaitReady()
 
-        redditIntegrationRunner.run(storage, redditFacade, jda)
-
         commandListener.initCommands(jda, env)
+        redditIntegrationRunner.run(storage, redditFacade, jda)
+        statusCheck.run(storage, redditFacade, jda)
 
         jda.presence.setPresence(Activity.watching("out for hot takes"), false)
-
         log.info("Ready for action")
     } catch (e: Exception) {
+        statusCheck.stop()
         redditIntegrationRunner.stop()
         log.error(e.message, e)
     }
