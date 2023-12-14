@@ -6,7 +6,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./erdmaschine.status:/var/erdmaschine.status
+      - ${PWD}/erdmaschine.status:/var/erdmaschine.status
     environment:
       JAVA_OPTS: "${JAVA_OPTS}"
       JDBC_DATABASE_URL: "jdbc:postgresql://db/postgres?user=postgres&password=${DB_PW}"

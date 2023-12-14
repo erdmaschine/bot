@@ -13,6 +13,8 @@ WORKDIR /app
 
 COPY --from=build /app/target .
 
+RUN ["touch", "/var/erdmaschine.status"]
+
 ENV JAVA_OPTS=""
 
 CMD java $JAVA_OPTS -cp classes:dependency/* erdmaschine.bot.MainKt
