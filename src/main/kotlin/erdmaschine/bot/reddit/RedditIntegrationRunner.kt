@@ -47,12 +47,11 @@ class RedditIntegrationRunner(env: Env) {
                 val channel = jda.getGuildById(sub.guildId)?.getGuildChannelById(sub.channelId)
                 if (channel == null) {
                     log.warn("Could not find channel for $sub")
-                    storage.removeSub(sub.guildId, sub.channelId, sub.sub)
                     return@forEach
                 }
 
                 if (channel !is TextChannel) {
-                    storage.removeSub(sub.guildId, sub.channelId, sub.sub)
+                    log.warn("$sub is assigned to non-text-channel")
                     return@forEach
                 }
 
