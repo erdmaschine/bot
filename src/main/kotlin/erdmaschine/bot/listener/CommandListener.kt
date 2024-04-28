@@ -26,6 +26,7 @@ private val slashCommandData = listOf(
     UwuCommand,
     FallacyCommand,
     RanickiCommand,
+    XkcdCommand,
     EmojiStatsCommand,
     PropagandaCommand,
     MiscCommand,
@@ -75,6 +76,7 @@ class CommandListener(
                 UwuCommand.name -> executeUwuCommand(event)
                 FallacyCommand.name -> executeFallacyCommand(event)
                 RanickiCommand.name -> executeRanickiCommand(event)
+                XkcdCommand.name -> executeXkcdCommand(event)
                 EmojiStatsCommand.name -> executeEmojiStats(storage, event)
                 PropagandaCommand.name -> executePropagandaCommand(event)
                 MiscCommand.name -> executeMiscCommand(event)
@@ -95,6 +97,7 @@ class CommandListener(
             val choices = when (event.name) {
                 FallacyCommand.name -> buildFallacyChoices(event)
                 RanickiCommand.name -> buildRanickiChoices(event)
+                XkcdCommand.name    -> buildXkcdChoices(event)
                 PropagandaCommand.name -> buildPropagandaChoices(event)
                 else -> listOf()
             }
@@ -104,3 +107,4 @@ class CommandListener(
         }
     }
 }
+
